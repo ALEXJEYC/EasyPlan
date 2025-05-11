@@ -1,36 +1,57 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyPlan</title>
+    @vite('resources/css/app.css')
+    @livewireStyles
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    @auth
+    <div class="flex h-screen">
+        <!-- Navbar Izquierdo -->
+        <aside class="w-64 bg-white dark:bg-gray-800 shadow-md">
+            <div class="p-4 text-center">
+                <x-application-logo class="h-10 w-auto mx-auto" />
+                <h2 class="text-xl font-bold mt-2">EasyPlan</h2>
+            </div>
+            <nav class="mt-4">
+                <ul>
+                    <li class="px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <a href="/dashboard" class="block">Inicio</a>
+                    </li>
+                    <li class="px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <a href="/projects" class="block">Proyectos</a>
+                    </li>
+                    <li class="px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <a href="/chats" class="block">Chats</a>
+                    </li>
+                    <li class="px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <a href="/settings" class="block">Configuración</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <!-- Contenido Principal -->
+        <div class="flex-1 flex flex-col">
+            <!-- Navbar Superior -->
             @include('layouts.navigation')
 
-            <!-- Page Heading -->
-            @if (isset($header))
-                <header class="bg-white dark:bg-gray-800 shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endif
-
-            <!-- Page Content -->
-            <main>
+            <!-- Contenido -->
+            <main class="flex-1 p-6">
                 {{ $slot }}
             </main>
         </div>
-    </body>
+    </div>
+    @else
+    <!-- Si no está autenticado, solo muestra el contenido -->
+    <div class="min-h-screen flex items-center justify-center">
+        {{ $slot }}
+    </div>
+    @endauth
+
+    @livewireScripts
+</body>
 </html>
