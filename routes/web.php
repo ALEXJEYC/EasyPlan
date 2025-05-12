@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\OrganizationController;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Login;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -76,6 +77,7 @@ Route::get('/auth/user', function () {
     }
     return null;
 });
+Route::get('/organization/{organization}', [OrganizationController::class, 'show'])->name('organization.show');
 // Rutas adicionales para chats y mensajes
 Route::middleware(['auth'])->group(function () {
     Route::get('/chats/{chat}/get-user', [ChatController::class, 'getUser'])->name('chat.get-user');

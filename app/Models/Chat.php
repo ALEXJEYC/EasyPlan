@@ -12,14 +12,40 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Chat extends Model
 {
     use HasFactory;
-
-    public function users(): BelongsToMany
+    protected $fillable = [
+        'type', 'name', 'organization_id', 'project_id', 'created_by'
+    ];
+    public function messages()
     {
-        return $this->belongsToMany(User::class);
+        return $this->hasMany(Message::class)->orderBy('created_at');
     }
 
-    public function messages(): HasMany
+    public function users()
     {
-        return $this->hasMany(Message::class);
+        return $this->belongsToMany(User::class, 'chat_user')->withTimestamps();
     }
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+//     public function users(): BelongsToMany
+//     {
+//         return $this->belongsToMany(User::class);
+//     }
+
+//     public function messages(): HasMany
+//     {
+//         return $this->hasMany(Message::class);
+//     }
 }

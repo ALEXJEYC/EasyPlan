@@ -55,4 +55,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Message::class);
     }
+    public function memberships()
+    {
+        return $this->hasMany(Membership::class);
+    }
+    
+    public function organizations()
+    {
+        return $this->belongsToMany(Organization::class, 'memberships')
+                    ->withPivot('role')
+                    ->withTimestamps();
+    }
+
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'project_user')->withTimestamps();
+    }
 }
