@@ -15,6 +15,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\ProjectController;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,7 +78,20 @@ Route::get('/auth/user', function () {
     }
     return null;
 });
-Route::get('/organization/{organization}', [OrganizationController::class, 'show'])->name('organization.show');
+Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+Route::patch('/projects/{project}/archive', [ProjectController::class, 'archive'])->name('projects.archive');
+Route::patch('/projects/{project}/unarchive', [ProjectController::class, 'unarchive'])->name('projects.unarchive');
+// Rutas para la creación de organizaciones
+Route::middleware(['auth'])->group(function () {
+    Route::get('/organizations/{organization}', [OrganizationController::class, 'show'])->name('organizations.show');
+    Route::post('/organizations/{organization}/sync-chat-members', [OrganizationController::class, 'syncChatMembers'])->name('organizations.syncChatMembers');
+    Route::post('/organizations/{organization}/add-member', [OrganizationController::class, 'addMember'])->name('organizations.addMember');
+
+    Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chat.show');
+    
+    // Route::post('/chats/{chat}/typing', [ChatController::class, 'sendTypingEvent'])->name('chat.typing');
+});
+// Route::get('/organization/{organization}', [OrganizationController::class, 'show'])->name('organization.show');
 // Rutas adicionales para chats y mensajes
 Route::middleware(['auth'])->group(function () {
     Route::get('/chats/{chat}/get-user', [ChatController::class, 'getUser'])->name('chat.get-user');

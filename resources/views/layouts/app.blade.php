@@ -41,7 +41,11 @@
 
             <!-- Contenido -->
             <main class="flex-1 p-6">
-                {{ $slot }}
+                @hasSection('content')
+                    @yield('content') <!-- Renderiza el contenido de las vistas como show.blade.php -->
+                @else
+                    {{ $slot ?? '' }} <!-- Renderiza el slot si está definido (como en el dashboard) -->
+                @endif
             </main>
         </div>
     </div>

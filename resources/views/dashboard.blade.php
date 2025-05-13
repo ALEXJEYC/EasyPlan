@@ -1,3 +1,4 @@
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -30,10 +31,9 @@
         <livewire:create-organization />
     </div>
 
-<!-- Lista de organizaciones -->
-
-<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-6 mb-12">
-    <h2 class="text-xl font-bold mb-4">Mis Organizaciones</h2>
-    <livewire:organization-list />
-</div>
+    <!-- Lista de organizaciones -->
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-6 mb-12">
+        <h2 class="text-xl font-bold mb-4">Mis Organizaciones</h2>
+        <livewire:organization-list />
+    </div>
 </x-app-layout>

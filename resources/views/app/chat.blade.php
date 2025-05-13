@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Laravel Chat</title>
+    <title>{{ $chat->organization->name }} - EasyPlan</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
@@ -199,11 +199,20 @@
         <header class="msger-header">
             <div class="msger-header-title">
                 <i class="fas fa-comment-alt"></i>
-                <span class="chatWith"></span>
+                <span class="chatWith">{{ $chat->organization->name }}</span> <!-- Nombre de la organización -->
                 <span class="typing" style="display:none;"> está escribiendo</span>
             </div>
             <div class="msger-header-options">
+                <button onclick="toggleMembers()" class="text-blue-600 underline">Ver Miembros</button>
                 <span class="chatStatus offline"><i class="fas fa-globe"></i></span>
+            </div>
+            <div id="chat-members" style="display: none;">
+                <h3 class="text-lg font-bold">Miembros del Chat</h3>
+                <ul>
+                    @foreach ($chat->users as $user)
+                        <li>{{ $user->name }} ({{ $user->pivot->role }})</li>
+                    @endforeach
+                </ul>
             </div>
         </header>
 
@@ -220,3 +229,9 @@
 </body>
 
 </html>
+<script>
+    function toggleMembers() {
+        const membersDiv = document.getElementById('chat-members');
+        membersDiv.style.display = membersDiv.style.display === 'none' ? 'block' : 'none';
+    }
+</script>

@@ -1,49 +1,134 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ tab: 'description' }" x-cloak>
         <h1 class="text-2xl font-bold mb-6">{{ $organization->name }}</h1>
 
-        <!-- Sección de Chats -->
-        <div class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">Chats</h2>
-
-            <!-- Chat Grupal Principal -->
-            <div class="mb-4 p-4 border rounded bg-blue-50">
-                <a href="{{ route('chat.show', $organization->chats->first()) }}">
-                    {{ $organization->chats->first()?->name ?? 'Chat principal' }}
-                </a>
-            </div>
-
-            <!-- Proyectos y sus Chats -->
-            @foreach($organization->projects as $project)
-                <div class="mb-4 p-4 border rounded bg-green-50">
-                    <a href="{{ route('project.show', $project) }}">
-                        {{ $project->name }}
-                    </a>
-                    @if($project->chats->isNotEmpty())
-                        <ul class="ml-4 mt-2">
-                            @foreach($project->chats as $chat)
-                                <li>
-                                    <a href="{{ route('chat.show', $chat) }}" class="text-blue-600 underline">
-                                        {{ $chat->name }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-                </div>
-            @endforeach
+        <!-- Navegación de pestañas -->
+        <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
+            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
+                <li class="mr-2">
+                    <button @click="tab = 'description'" :class="{ 'border-blue-600 text-blue-600': tab === 'description' }" class="inline-block p-4 border-b-2 border-transparent hover:border-blue-600 hover:text-blue-600">Descripción</button>
+                </li>
+                <li class="mr-2">
+                    <button @click="tab = 'chats'" :class="{ 'border-blue-600 text-blue-600': tab === 'chats' }" class="inline-block p-4 border-b-2 border-transparent hover:border-blue-600 hover:text-blue-600">Chats</button>
+                </li>
+                <li class="mr-2">
+                    <button @click="tab = 'projects'" :class="{ 'border-blue-600 text-blue-600': tab === 'projects' }" class="inline-block p-4 border-b-2 border-transparent hover:border-blue-600 hover:text-blue-600">Proyectos</button>
+                </li>
+                <li class="mr-2">
+                    <button @click="tab = 'members'" :class="{ 'border-blue-600 text-blue-600': tab === 'members' }" class="inline-block p-4 border-b-2 border-transparent hover:border-blue-600 hover:text-blue-600">Miembros</button>
+                </li>
+            </ul>
         </div>
 
-        <!-- Sección de Usuarios -->
-        <div>
-            <h2 class="text-xl font-semibold mb-4">Miembros</h2>
-            <ul>
-                @foreach($organization->users as $user)
-                    <li>{{ $user->name }} ({{ $user->pivot->role }})</li>
+        <!-- Pestaña: Descripción -->
+        <div x-show="tab === 'description'" class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Visión de la organización</h2>
+            <p class="text-gray-600 dark:text-gray-400">Aquí puedes agregar una descripción o visión general de la organización.</p>
+        </div>
+
+        <!-- Pestaña: Chats -->
+        <div x-show="tab === 'chats'" class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Chats</h2>
+            @if ($organization->chats->isEmpty())
+                <p class="text-gray-500">No hay chats disponibles para esta organización.</p>
+            @else
+                <!-- Chat Grupal Principal -->
+                <div class="mb-4 p-4 border rounded bg-blue-50">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Chat Grupal Organización</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Este es el chat principal de la organización.</p>
+                    <a href="{{ route('chat.show', $organization->chats->first()) }}" class="text-blue-600 underline">Ir al chat grupal</a>
+                </div>
+
+                <!-- Otros Chats -->
+                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mt-6">Chats Proyectos</h3>
+                <ul class="space-y-4 mt-4">
+                    @foreach ($organization->chats as $chat)
+                        @if ($chat->type === 'project')
+                            <li class="p-4 bg-white dark:bg-gray-800 rounded shadow">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h4 class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $chat->name }}</h4>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $chat->description ?? 'Sin descripción disponible.' }}</p>
+                                    </div>
+                                    <a href="{{ route('chat.show', $chat) }}" class="text-blue-600 underline">Abrir Chat</a>
+                                </div>
+                            </li>
+                        @endif
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+        <!-- Pestaña: Proyectos -->
+        <div x-show="tab === 'projects'" class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Proyectos</h2>
+            @livewire('project-list', ['organization' => $organization])
+
+            <!-- Proyectos archivados -->
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mt-6">Proyectos Archivados</h3>
+            <ul class="space-y-4 mt-4">
+                @foreach ($organization->projects->where('status', 'archived') as $project)
+                    <li class="p-4 bg-gray-100 dark:bg-gray-700 rounded shadow">
+                        <h4 class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $project->name }}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $project->description }}</p>
+                        <img src="{{ $project->getFirstMediaUrl('images') }}" alt="Imagen del Proyecto" class="mt-4 w-full h-auto">
+                        <div class="mt-4 flex justify-between items-center">
+                            <a href="{{ route('projects.show', $project) }}" class="text-blue-600 underline">Ver Proyecto</a>
+                            <form action="{{ route('projects.unarchive', $project) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="text-green-600 underline">Desarchivar</button>
+                            </form>
+                        </div>
+                    </li>
                 @endforeach
             </ul>
+        </div>
+        <!-- Pestaña: Miembros -->
+        <div x-show="tab === 'members'" class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Miembros</h2>
+            <div class="mt-8">
+                <h3 class="text-lg font-bold mb-4">Agregar Miembro</h3>
+                <form action="{{ route('organizations.addMember', $organization) }}" method="POST">
+                    @csrf
+                    <div class="mb-4">
+                        <label for="user_id" class="block text-sm font-medium text-gray-700">Usuario</label>
+                        <select name="user_id" id="user_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            @foreach ($users as $user)
+                                <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="role" class="block text-sm font-medium text-gray-700">Rol</label>
+                        <select name="role" id="role" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            <option value="admin">Administrador</option>
+                            <option value="member">Miembro</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Agregar</button>
+                </form>
+            </div>
+
+            @if ($organization->members->isEmpty())
+                <p class="text-gray-500">No hay miembros en esta organización.</p>
+            @else
+                <ul class="space-y-4">
+                    @foreach ($organization->members as $member)
+                        <li class="p-4 bg-white dark:bg-gray-800 rounded shadow">
+                            <div class="flex items-center">
+                                <img src="{{ $member->profile_photo_url ?? 'https://via.placeholder.com/50' }}" alt="{{ $member->name }}" class="w-12 h-12 rounded-full mr-4">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $member->name }}</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $member->email }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Rol: {{ $member->pivot->role ?? 'Sin rol asignado' }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
         </div>
     </div>
 @endsection

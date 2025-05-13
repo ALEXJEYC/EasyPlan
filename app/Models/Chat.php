@@ -39,6 +39,11 @@ class Chat extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    // public function isGroup()
+    // {
+    //     return $this->type === 'group';
+    // }
+
 //     public function users(): BelongsToMany
 //     {
 //         return $this->belongsToMany(User::class);

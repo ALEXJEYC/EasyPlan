@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Project extends Model
+class Project extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
-    protected $fillable = ['organization_id', 'name', 'description'];
+    protected $fillable = ['organization_id', 'name', 'description', 'status'];
 
     public function organization()
     {
@@ -27,6 +29,26 @@ class Project extends Model
     {
         return $this->users()->where('id', $user->id)->exists();
     }
+    // protected static function boot()
+    // {
+    // parent::boot();
+
+    // static::created(function ($project) {
+    //     $user = auth()->user();
+
+    //     // Crear chat para el proyecto
+    //     $chat = Chat::create([
+    //         'type' => 'project',
+    //         'name' => $project->name . ' Chat',
+    //         'project_id' => $project->id,
+    //         'organization_id' => $project->organization_id,
+    //         'created_by' => $user->id,
+    //     ]);
+
+    //     // Añadir al creador del chat y a los usuarios seleccionados
+    //     $chat->users()->attach($project->users->pluck('id'));
+    // });
+
     // public function hasUser(User $user): bool
     // {
         // return $this->users->contains($user);

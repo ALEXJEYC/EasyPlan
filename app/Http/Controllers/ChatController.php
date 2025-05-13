@@ -11,7 +11,15 @@ class ChatController extends Controller
 {
     public function show(Chat $chat)
     {
-        abort_unless($chat->users->contains(auth()->id()), 403);
+        $organization = $chat->organization;
+        $this->authorize('view', $chat);
+        $this->authorize('view', $organization);
+        if (!$chat->users->contains(auth()->user())) {
+        abort(403, 'No tienes permiso para acceder a este chat.');
+    }
+        
+        // abort_unless($chat->users->contains(auth()->id()), 403);
+        // $this->authorize('view', $chat);
 
         return view('app.chat', compact('chat'));
     }
@@ -44,4 +52,11 @@ class ChatController extends Controller
 
         return redirect()->route('chat.show', $chat);
     }
+    // public function sendTypingEvent(Request $request)
+    // {
+    //     $user = auth()->user();
+    //     $chatId = $request->chat_id; 
+
+    //     broadcast(new Typing($user, $chatId));
+    // }
 }
