@@ -1,3 +1,6 @@
+
+
+<!-- navbar superior -->
 <nav class="bg-white dark:bg-gray-800 shadow-md">
     <div class="flex justify-between items-center px-6 py-4">
         <h1 class="text-2xl font-bold">Dashboard</h1>

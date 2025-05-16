@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Chat;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class ChatPolicy
+class ProjectPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,10 +19,9 @@ class ChatPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Chat $chat): bool
+    public function view(User $user, Project $project): bool
     {
-        // Permitir acceso si el usuario pertenece al chat
-    return $chat->users()->where('users.id', $user->id)->exists();
+        return $project->users()->where('users.id', $user->id)->exists();
     }
 
     /**
@@ -36,7 +35,7 @@ class ChatPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Chat $chat): bool
+    public function update(User $user, Project $project): bool
     {
         //
     }
@@ -44,7 +43,7 @@ class ChatPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Chat $chat): bool
+    public function delete(User $user, Project $project): bool
     {
         //
     }
@@ -52,7 +51,7 @@ class ChatPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Chat $chat): bool
+    public function restore(User $user, Project $project): bool
     {
         //
     }
@@ -60,7 +59,7 @@ class ChatPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Chat $chat): bool
+    public function forceDelete(User $user, Project $project): bool
     {
         //
     }

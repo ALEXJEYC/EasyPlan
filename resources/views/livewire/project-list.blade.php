@@ -4,17 +4,20 @@
         <span class="text-4xl font-bold text-blue-600">+</span>
     </div>
         <!-- Modal para crear un proyecto -->
-    @if ($isModalOpen)
-        <div class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div class="bg-white p-6 rounded shadow-lg w-1/2">
-                <h2 class="text-xl font-bold mb-4">Crear Nuevo Proyecto</h2>
-                <livewire:create-project :organization="$organization" />
-                <button type="button" wire:click="closeModal" class="mt-4 bg-gray-500 text-white px-4 py-2 rounded">Cerrar</button>
-            </div>
-        </div>
-    @endif
+        @if ($isModalOpen)
+            <div class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                <div class="bg-white p-6 rounded shadow-lg w-1/2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Crear Nuevo Proyecto</h2>
+                        <button type="button" wire:click="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+                    </div>
 
-    <!-- Modal para crear un proyecto -->
+                    <livewire:create-project :organization="$organization" />
+                </div>
+            </div>
+        @endif
+
+    <!-- Lista de proyectos -->
     @foreach ($projects as $project)
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
             <img src="{{ $project->getFirstMediaUrl('images') ?? 'https://via.placeholder.com/400x200' }}" alt="Imagen del Proyecto" class="w-full h-48 object-cover">

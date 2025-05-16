@@ -84,6 +84,7 @@ Route::patch('/projects/{project}/unarchive', [ProjectController::class, 'unarch
 // Rutas para la creación de organizaciones
 Route::middleware(['auth'])->group(function () {
     Route::get('/organizations/{organization}', [OrganizationController::class, 'show'])->name('organizations.show');
+    Route::get('/organizations/{organization}/chats', [ChatController::class, 'index'])->name('chats.index');
     Route::post('/organizations/{organization}/sync-chat-members', [OrganizationController::class, 'syncChatMembers'])->name('organizations.syncChatMembers');
     Route::post('/organizations/{organization}/add-member', [OrganizationController::class, 'addMember'])->name('organizations.addMember');
 

@@ -29,6 +29,12 @@ class Project extends Model implements HasMedia
     {
         return $this->users()->where('id', $user->id)->exists();
     }
+    public function scopeForUser($query, $userId)
+    {
+        return $query->whereHas('users', function ($q) use ($userId) {
+            $q->where('users.id', $userId);
+        });
+    }
     // protected static function boot()
     // {
     // parent::boot();

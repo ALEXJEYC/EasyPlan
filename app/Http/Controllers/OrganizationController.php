@@ -13,9 +13,12 @@ class OrganizationController extends Controller
         
         $this->authorize('view', $organization); // Si usas policies
             // Cargar la relación members
+        $chats = $organization->chats()->whereHas('users', function ($query) {
+            $query->where('users.id', auth()->id());
+        })->get();            
         $users = User::whereNotIn('id', $organization->members->pluck('id'))->get();
         $organization->load('members', 'projects', 'chats');
-        return view('organizations.show', compact('organization', 'users'));
+        return view('organizations.show', compact('organization', 'users', 'chats'));
     }
     public function addMember(Request $request, Organization $organization)
     {

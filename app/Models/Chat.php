@@ -39,6 +39,12 @@ class Chat extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    public function scopeForUser($query, $userId)
+    {
+        return $query->whereHas('users', function ($q) use ($userId) {
+            $q->where('users.id', $userId);
+        });
+    }
     // public function isGroup()
     // {
     //     return $this->type === 'group';

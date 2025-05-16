@@ -7,7 +7,6 @@ use Livewire\WithFileUploads;
 use App\Models\Project;
 use App\Models\Chat;
 
-
 class CreateProject extends Component
 {
     use WithFileUploads;
@@ -17,6 +16,18 @@ class CreateProject extends Component
     public $description;
     public $image;
     public $members = [];
+
+    public $organizationMembers; // << Para pasar al render
+
+    public function mount($organization)
+    {
+        $this->organization = $organization;
+
+        // Excluir al usuario autenticado de la lista de miembros disponibles
+        $this->organizationMembers = $organization->members->filter(function ($member) {
+            return $member->id !== auth()->id();
+        });
+    }
 
     public function createProject()
     {
@@ -33,42 +44,41 @@ class CreateProject extends Component
             'status' => 'iniciado',
         ]);
 
-        // Subir la imagen si se proporciona
         if ($this->image) {
-        // Mover el archivo temporal a una ubicación permanente
-        $path = $this->image->store('projects/images', 'public');
-
-        // Asociar el archivo al proyecto usando Spatie Media Library
-        $project->addMedia(storage_path('app/public/' . $path))->toMediaCollection('images');
+            $path = $this->image->store('projects/images', 'public');
+            $project->addMedia(storage_path('app/public/' . $path))->toMediaCollection('images');
         }
 
-        // Asociar el proyecto con los miembros seleccionados
-        $this->members = array_filter($this->members, function ($member) {
-            return $member !== auth()->id();
-        });
-        $this->members[] = auth()->id(); // Asegurarse de que el creador esté incluido
-        $this->members = array_unique($this->members); // Eliminar duplicados
-        $project->users()->sync($this->members); // Sincronizar los miembros seleccionados
+        // Asegurar que el creador esté incluido
+        $members = collect($this->members)
+            ->filter(fn($id) => $id != auth()->id())
+            ->push(auth()->id())
+            ->unique()
+            ->toArray();
 
+        $project->users()->sync($members);
 
-        // Crear un chat para el proyecto
-        Chat::create([  
+        // Crear un chat y asociar miembros
+        Chat::create([
             'type' => 'project',
             'name' => $this->name . ' Chat',
             'project_id' => $project->id,
             'organization_id' => $this->organization->id,
             'created_by' => auth()->id(),
-        ]);
-        // Emitir un evento para actualizar la lista de proyectos
-        $this->dispatch('refreshProjectList');
+        ])->users()->sync($members);
 
-        // Reiniciar los campos y cerrar el modal
+        // $this->dispatch('refreshProjectList');
+        $this->dispatch('projectCreated');	
+        $this->dispatch('chatCreated');
+
+
         $this->reset(['name', 'description', 'image', 'members']);
     }
+
     public function render()
     {
         return view('livewire.create-project', [
-            'organizationMembers' => $this->organization->members,
+            'organizationMembers' => $this->organizationMembers,
         ]);
     }
 }

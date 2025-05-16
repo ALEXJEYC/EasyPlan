@@ -11,18 +11,27 @@ class ChatController extends Controller
 {
     public function show(Chat $chat)
     {
-        $organization = $chat->organization;
+        // Autorizar el acceso al chat
         $this->authorize('view', $chat);
-        $this->authorize('view', $organization);
-        if (!$chat->users->contains(auth()->user())) {
-        abort(403, 'No tienes permiso para acceder a este chat.');
-    }
-        
-        // abort_unless($chat->users->contains(auth()->id()), 403);
-        // $this->authorize('view', $chat);
 
+        // Retornar la vista del chat
         return view('app.chat', compact('chat'));
     }
+    public function index(Organization $organization)
+    {
+        // Obtener solo los chats de la organización y del usuario autenticado
+        $chats = Chat::where('organization_id', $organization->id)
+            ->whereHas('users', function ($query) {
+                $query->where('users.id', auth()->id());
+            })
+            ->get();
+
+        // También necesitas pasar los usuarios para la pestaña de "miembros"
+        $users = User::whereNotIn('id', $organization->members->pluck('id'))->get();
+
+        return view('app.chats', compact('organization', 'chats', 'users'));
+    }
+    
 
     public function getUser(Chat $chat)
     {
