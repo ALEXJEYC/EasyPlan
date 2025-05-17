@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Organization;
+use App\Models\CustomRole;
+use App\Models\OrganizationOwner;
 
 class CreateOrganization extends Component
 {
@@ -15,31 +17,34 @@ class CreateOrganization extends Component
 
     public function createOrganization()
     {
-    // Validar entrada
-    $this->validate([
-        'name' => 'required|string|max:255',
-    ]);
 
-    // Crear organización
-    $organization = Organization::create([
-        'name' => $this->name,
-        'owner_id' => auth()->id(), // Establecer el propietario en la tabla organizations
-    ]);
+        $this->validate();
 
-    // Asociar al usuario autenticado con la organización en la tabla memberships
-    $organization->members()->attach(auth()->id(), ['role' => 'owner']);
+        $organization = Organization::create([
+            'name' => $this->name,
+        ]);
 
-    // Limpiar campo del formulario
-    $this->reset('name');
+        OrganizationOwner::create([
+            'user_id' => auth()->id(),
+            'organization_id' => $organization->id,
+        ]);
+    // Crear o buscar el rol Fundador
+        $propietario = CustomRole::firstOrCreate([
+            'organization_id' => $organization->id,
+            'name' => 'owner',
+        ]);
 
-    // Mensaje flash de éxito
-    session()->flash('message', 'Organización creada exitosamente.');
+        // Agregar al dueño como miembro con rol Fundador
+        $organization->memberships()->create([
+            'user_id' => auth()->id(),
+            'custom_role_id' => $propietario->id,
+        ]);
+        $this->reset('name');
 
-        // Opcional: emitir evento para notificar a otros componentes
-    // $this->dispatch('organization-created');
-    $this->dispatch('organization-created', $organization->id);
+        session()->flash('message', 'Organización creada exitosamente.');
+
+        $this->dispatch('organization-created', $organization->id);
     }
-
     public function render()
     {
         return view('livewire.create-organization');
