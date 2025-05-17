@@ -5,7 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-
+use App\Models\Organization;
 
 
 class OrganizationList extends Component
@@ -24,8 +24,20 @@ class OrganizationList extends Component
     }
     private function loadOrganizations()
     {
-        $this->organizations = auth()->user()->organizations;
+        $user = auth()->user();
+
+        $ownerOrganizations = Organization::whereHas('ownerRelation', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->get();
+
+        $memberOrganizations = $user->memberships()->with('organization')->get()->map(function ($membership) {
+            return $membership->organization;
+        });
+
+
+        $this->organizations = $ownerOrganizations->merge($memberOrganizations);
     }
+
 
     public function render()
     {

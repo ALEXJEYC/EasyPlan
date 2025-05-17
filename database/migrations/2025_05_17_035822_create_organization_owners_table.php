@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('memberships', function (Blueprint $table) {
+        Schema::create('organization_owners', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('organization_id')->constrained()->onDelete('cascade');
-            $table->foreignId('custom_role_id')->nullable()->constrained('custom_roles')->onDelete('set null');
-            // $table->string('role')->default('member'); // admin, moderador, miembro, etc.
             $table->timestamps();
-                   
-            $table->unique(['user_id', 'organization_id']);
+        
+            $table->unique('organization_id'); // Cada organización solo puede tener un owner
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('memberships');
+        Schema::dropIfExists('organization_owners');
     }
 };

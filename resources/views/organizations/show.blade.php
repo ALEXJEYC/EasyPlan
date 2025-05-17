@@ -96,7 +96,7 @@
                                 <div>
                                     <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $member->name }}</h3>
                                     <p class="text-sm text-gray-600 dark:text-gray-400">{{ $member->email }}</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Rol: {{ $member->pivot->role ?? 'Sin rol asignado' }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Rol: {{ $member->pivot->customRole->name ?? 'Sin rol asignado' }} </p>
                                 </div>
                             </div>
                         </li>

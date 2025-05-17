@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('memberships', function (Blueprint $table) {
+        Schema::create('custom_roles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('organization_id')->constrained()->onDelete('cascade');
-            $table->foreignId('custom_role_id')->nullable()->constrained('custom_roles')->onDelete('set null');
-            // $table->string('role')->default('member'); // admin, moderador, miembro, etc.
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->json('custom_permissions')->nullable(); // JSON de permisos adicionales
             $table->timestamps();
-                   
-            $table->unique(['user_id', 'organization_id']);
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('memberships');
+        Schema::dropIfExists('custom_roles');
     }
 };

@@ -9,14 +9,16 @@ class Organization extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'type', 'description', 'owner_id'];
+    protected $fillable = ['name', 'type', 'description'];
 
     public function members()
     {
         return $this->belongsToMany(User::class, 'memberships')
-                    ->withPivot('role')
+                    ->using(Membership::class)
+                    ->withPivot('custom_role_id')
                     ->withTimestamps();
     }
+
     public function memberships()
     {
         return $this->hasMany(Membership::class);
@@ -30,10 +32,11 @@ class Organization extends Model
         return $this->hasMany(Project::class);
     }
 
-    public function owner()
-    {   
-        return $this->belongsTo(User::class, 'owner_id');
+    public function ownerRelation()
+    {
+        return $this->hasOne(OrganizationOwner::class);
     }
+
     public function chats()
     {
         return $this->hasMany(Chat::class);
@@ -42,10 +45,7 @@ class Organization extends Model
     {
         return $this->hasMany(Message::class);
     }
-    public function isOwnedBy(User $user): bool
-    {
-        return $this->owner_id === $user->id;
-    }
+
     // public function hasUser(User $user): bool
     protected static function boot()
     {
