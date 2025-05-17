@@ -16,6 +16,8 @@ class AuthServiceProvider extends ServiceProvider
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
         Organization::class => OrganizationPolicy::class,
         Chat::class => ChatPolicy::class,
+        Task::class => TaskPolicy::class,
+        Project::class => ProjectPolicy::class,
     ];
 
     /**
