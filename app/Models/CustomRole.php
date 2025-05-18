@@ -33,4 +33,9 @@ class CustomRole extends Model
     {
         return $this->hasMany(CustomRolePermission::class, 'custom_role_id');
     }
+    //permisos especiales 
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'custom_role_permissions');
+    }
 }

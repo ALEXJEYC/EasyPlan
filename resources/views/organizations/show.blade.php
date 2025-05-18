@@ -61,48 +61,12 @@
         </div>
         <!-- Pestaña: Miembros -->
         <div x-show="tab === 'members'" class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">Miembros</h2>
-            <div class="mt-8">
-                <h3 class="text-lg font-bold mb-4">Agregar Miembro</h3>
-                <form action="{{ route('organizations.addMember', $organization) }}" method="POST">
-                    @csrf
-                    <div class="mb-4">
-                        <label for="user_id" class="block text-sm font-medium text-gray-700">Usuario</label>
-                        <select name="user_id" id="user_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="role" class="block text-sm font-medium text-gray-700">Rol</label>
-                        <select name="role" id="role" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                            <option value="admin">Administrador</option>
-                            <option value="member">Miembro</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Agregar</button>
-                </form>
-            </div>
+             @livewire('organization.create-role', [
+                'organization' => $organization,
+                'canManageMembers' => $canManageMembers
+            ], key($organization->id))
 
-            @if ($organization->members->isEmpty())
-                <p class="text-gray-500">No hay miembros en esta organización.</p>
-            @else
-                <ul class="space-y-4">
-                    @foreach ($organization->members as $member)
-                        <li class="p-4 bg-white dark:bg-gray-800 rounded shadow">
-                            <div class="flex items-center">
-                                <img src="{{ $member->profile_photo_url ?? 'https://via.placeholder.com/50' }}" alt="{{ $member->name }}" class="w-12 h-12 rounded-full mr-4">
-                                <div>
-                                    <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ $member->name }}</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $member->email }}</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Rol: {{ $member->pivot->customRole->name ?? 'Sin rol asignado' }} </p>
-                                </div>
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
-            @endif
         </div>
+
     </div>
 @endsection

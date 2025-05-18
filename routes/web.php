@@ -86,7 +86,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/organizations/{organization}', [OrganizationController::class, 'show'])->name('organizations.show');
     Route::get('/organizations/{organization}/chats', [ChatController::class, 'index'])->name('chats.index');
     Route::post('/organizations/{organization}/sync-chat-members', [OrganizationController::class, 'syncChatMembers'])->name('organizations.syncChatMembers');
+
     Route::post('/organizations/{organization}/add-member', [OrganizationController::class, 'addMember'])->name('organizations.addMember');
+        // 🆕 Nuevas rutas:
+    Route::delete('/organizations/{organization}/remove-member/{user}', [OrganizationController::class, 'removeMember'])->name('organizations.removeMember');
+    Route::put('/organizations/{organization}/update-role/{user}', [OrganizationController::class, 'updateMemberRole'])->name('organizations.updateMemberRole');
+    Route::delete('/organizations/{organization}', [OrganizationController::class, 'destroy'])->name('organizations.destroy');
 
     Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chat.show');
     
@@ -101,3 +106,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/message/sent', [MessageController::class, 'sent'])->name('message.sent');
     Route::get('/chats/{chat}/get-messages', [MessageController::class, 'getMessages'])->name('getMessages');
 });
+
+// use Illuminate\Support\Facades\Route;
+
+Route::get('/test-permisos', function () {
+    return view('test-permisos');
+})->middleware('auth');

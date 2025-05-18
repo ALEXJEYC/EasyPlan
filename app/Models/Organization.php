@@ -18,6 +18,11 @@ class Organization extends Model
                     ->withPivot('custom_role_id')
                     ->withTimestamps();
     }
+    public function customRoles()
+    {
+        return $this->hasMany(CustomRole::class);
+    }
+
 
     public function memberships()
     {

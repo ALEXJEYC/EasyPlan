@@ -11,6 +11,18 @@ class OrganizationPolicy
     /**
      * Determine whether the user can view any models.
      */
+    public function manageMembers(User $user, Organization $organization)
+    {
+        return $organization->members->contains($user) &&
+            $user->hasPermissionTo('agregar_usuarios');
+    }
+
+    public function delete(User $user, Organization $organization)
+    {
+        return $organization->members->contains($user) &&
+            $user->hasPermissionTo('eliminar_organizacion');
+    }
+
     public function viewAny(User $user): bool
     {
         //
@@ -57,14 +69,14 @@ class OrganizationPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Organization $organization): bool
-    {
-        //
-    }
+    // public function delete(User $user, Organization $organization): bool
+    // {
+    //     //
+    // }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
+    // /**
+    //  * Determine whether the user can restore the model.
+    //  */
     public function restore(User $user, Organization $organization): bool
     {
         //

@@ -18,26 +18,14 @@ class OrganizationController extends Controller
         })->get();            
         $users = User::whereNotIn('id', $organization->members->pluck('id'))->get();
         $organization->load('members', 'projects', 'chats');
-        return view('organizations.show', compact('organization', 'users', 'chats'));
+    //     return view('organizations.show', compact('organization', 'users', 'chats'));
+    // }
+    return view('organizations.show',compact('organization', 'users', 'chats'), [
+    'organization' => $organization,
+    'canManageMembers' => auth()->user()->hasPermissionInOrganization('agregar_usuarios', $organization->id),
+]);
     }
-    public function addMember(Request $request, Organization $organization)
-    {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'role' => 'required|string',
-        ]);
-    
-        // Agregar el usuario a la organización con el rol especificado
-        $organization->members()->attach($request->user_id, ['role' => $request->role]);
-    
-        // Agregar el usuario al chat grupal de la organización
-        $chat = $organization->chats()->where('type', 'group')->first();
-        if ($chat) {
-            $chat->users()->syncWithoutDetaching($request->user_id); // Agregar sin eliminar los existentes
-        }
-    
-        return redirect()->back()->with('success', 'Usuario agregado a la organización con éxito.');
-    }
+
     public function syncChatMembers(Organization $organization)
     {
         $chat = $organization->chats()->where('type', 'group')->first();
@@ -49,4 +37,63 @@ class OrganizationController extends Controller
     
         return redirect()->back()->with('success', 'Miembros sincronizados con el chat grupal.');
     }
+    
+    public function addMember(Request $request, Organization $organization)
+    {
+        $this->authorize('manageMembers', $organization); // Usa policies o revisa permisos manualmente
+
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'required|string',
+        ]);
+
+        $organization->members()->attach($request->user_id, ['role' => $request->role]);
+
+        $chat = $organization->chats()->where('type', 'group')->first();
+        if ($chat) {
+            $chat->users()->syncWithoutDetaching($request->user_id);
+        }
+
+        return back()->with('success', 'Usuario agregado con éxito.');
+    }
+
+    public function updateMemberRole(Request $request, Organization $organization, User $user)
+    {
+        $this->authorize('manageMembers', $organization);
+
+        $request->validate([
+            'role' => 'required|string',
+        ]);
+
+        $organization->members()->updateExistingPivot($user->id, [
+            'role' => $request->role
+        ]);
+
+        return back()->with('success', 'Rol actualizado.');
+    }
+    public function removeMember(Organization $organization, User $user)
+    {
+        $this->authorize('manageMembers', $organization);
+
+        $organization->members()->detach($user->id);
+
+        $chat = $organization->chats()->where('type', 'group')->first();
+        if ($chat) {
+            $chat->users()->detach($user->id);
+        }
+
+        return back()->with('success', 'Usuario eliminado con éxito.');
+    }
+    public function destroy(Organization $organization)
+    {
+        $this->authorize('delete', $organization);
+
+        $organization->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Organización eliminada.');
+    }
+
+
+
+    
 }

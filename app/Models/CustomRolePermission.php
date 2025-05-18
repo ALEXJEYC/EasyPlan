@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Spatie\Permission\Models\Permission;
-
+//tabla pivot
 class CustomRolePermission extends Model
 {
     protected $table = 'custom_role_permissions';

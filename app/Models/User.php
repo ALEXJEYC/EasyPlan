@@ -10,10 +10,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    
 
     /**
      * The attributes that are mass assignable.
@@ -90,5 +92,23 @@ class User extends Authenticatable
     {
         return $this->hasMany(OrganizationOwner::class);
     }
+    public function assignedTasks()
+    {
+        return $this->belongsToMany(Task::class)->withTimestamps()->withPivot('status');
+    }
+
+    public function hasPermissionInOrganization($permissionName, $organizationId)
+    {
+        $membership = $this->memberships()
+            ->where('organization_id', $organizationId)
+            ->first();
+
+        if (!$membership || !$membership->customRole) {
+            return false;
+        }
+
+        return $membership->customRole->permissions->contains('name', $permissionName);
+    }
+
 
 }
