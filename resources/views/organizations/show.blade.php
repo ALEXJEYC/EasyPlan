@@ -61,12 +61,9 @@
         </div>
         <!-- Pestaña: Miembros -->
         <div x-show="tab === 'members'" class="mb-8">
-             @livewire('organization.create-role', [
-                'organization' => $organization,
-                'canManageMembers' => $canManageMembers
-            ], key($organization->id))
-
+        @livewire('organization.create-role', [
+            'organization' => $organization,
+        ], key($organization->id))
         </div>
 
-    </div>
 @endsection
