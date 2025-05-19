@@ -39,4 +39,9 @@ class Task extends Model
     {
         return $this->hasMany(TaskReview::class);
     }
+    //usuarios asignados a la tarea
+    public function assignedUsers()
+    {
+        return $this->belongsToMany(User::class)->withTimestamps()->withPivot('status');
+    }
 }
