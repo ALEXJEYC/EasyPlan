@@ -6,7 +6,7 @@ use Livewire\Component;
 use App\Models\Organization;
 use App\Models\CustomRole;
 use App\Models\Permission;
-use App\Models\OrganizationOwner;
+// use App\Models\OrganizationOwner;
 
 class CreateOrganization extends Component
 {
@@ -25,10 +25,10 @@ class CreateOrganization extends Component
             'name' => $this->name,
         ]);
 
-        OrganizationOwner::create([
-            'user_id' => auth()->id(),
-            'organization_id' => $organization->id,
-        ]);
+        // OrganizationOwner::create([
+        //     'user_id' => auth()->id(),
+        //     'organization_id' => $organization->id,
+        // ]);
     // Crear o buscar el rol Fundador
         $ownerRole = CustomRole::firstOrCreate([
             'organization_id' => $organization->id,
@@ -39,10 +39,15 @@ class CreateOrganization extends Component
          $this->assignDefaultPermissionsToOwner($ownerRole);
 
         // Agregar al dueño como miembro con rol Fundador
-        $organization->memberships()->create([
-            'user_id' => auth()->id(),
-            'custom_role_id' => $ownerRole->id,
-        ]);
+        $membership = $organization->memberships()
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if ($membership) {
+            $membership->custom_role_id = $ownerRole->id;
+            $membership->save();
+        }
+
         $this->reset('name');
 
         session()->flash('message', 'Organización creada exitosamente.');

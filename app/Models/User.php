@@ -97,8 +97,41 @@ class User extends Authenticatable
         return $this->belongsToMany(Task::class)->withTimestamps()->withPivot('status');
     }
 
-    public function hasPermissionInOrganization($permissionName, $organizationId)
+    // public function hasPermissionInOrganization($permissionName, $organizationId)
+    // {
+    //     $membership = $this->memberships()
+    //         ->where('organization_id', $organizationId)
+    //         ->first();
+
+    //     if (!$membership || !$membership->customRole) {
+    //         return false;
+    //     }
+
+    //     return $membership->customRole->permissions->contains('name', $permissionName);
+    // }
+    // public function hasPermissionInOrganization(string $permissionName, int $organizationId): bool
+    // {
+    //     $membership = $this->memberships()->where('organization_id', $organizationId)->first();
+        
+    //     if (!$membership || !$membership->customRole) {
+    //         return false;
+    //     }
+
+    //     return in_array($permissionName, $membership->customRole->permissions ?? []);
+    // }
+
+
+// En User.php
+    public function hasPermissionInOrganization(string $permission, int $organizationId): bool
     {
+        $organization = Organization::find($organizationId);
+        
+        // Si es el owner, tiene todos los permisos
+        if ($organization->isOwner($this)) {
+            return true;
+        }
+
+        // Verificar membresía
         $membership = $this->memberships()
             ->where('organization_id', $organizationId)
             ->first();
@@ -107,8 +140,13 @@ class User extends Authenticatable
             return false;
         }
 
-        return $membership->customRole->permissions->contains('name', $permissionName);
+        // Verificar permisos del rol
+        return $membership->customRole->permissions()
+            ->where('name', $permission)
+            ->exists();
     }
+
+
 
 
 }

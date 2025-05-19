@@ -22,16 +22,10 @@ class Organization extends Model
     {
         return $this->hasMany(CustomRole::class);
     }
-
-
     public function memberships()
     {
         return $this->hasMany(Membership::class);
     }
-    // public function users()
-    // {
-        // return $this->belongsToMany(User::class, 'organization_user')->withTimestamps();
-    // }
     public function projects()
     {
         return $this->hasMany(Project::class);
@@ -51,15 +45,23 @@ class Organization extends Model
         return $this->hasMany(Message::class);
     }
 
-    // public function hasUser(User $user): bool
     protected static function boot()
     {
         parent::boot();
 
         static::created(function ($organization) {
-            // Crear chat grupal por defecto
+            // Asignar al usuario creador como owner
             $user = auth()->user();
             
+            OrganizationOwner::create([
+                'user_id' => $user->id,
+                'organization_id' => $organization->id
+            ]);
+            
+            // Agregar también como miembro (opcional, dependiendo de tu lógica)
+            $organization->members()->attach($user->id);
+
+            // Crear chat grupal por defecto
             $chat = Chat::create([
                 'type' => 'group',
                 'name' => $organization->name . ' General',
@@ -67,8 +69,12 @@ class Organization extends Model
                 'created_by' => $user->id,
             ]);
 
-            // Añadir al creador del chat
             $chat->users()->attach($user);
         });
+
     }
+        public function isOwner(User $user): bool
+        {
+            return $this->ownerRelation->user_id === $user->id;
+        }
 }
