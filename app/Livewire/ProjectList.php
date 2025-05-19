@@ -10,11 +10,15 @@ class ProjectList extends Component
     public $isModalOpen = false;
     public $organization;
     public $projects;
-    protected $listeners = ['projectCreated' => 'handleProjectCreated'];
+    public $projectCreatedEventReceived = false; 
+    protected $listeners = ['projectCreated' => 'refreshProjects'];
     public function handleProjectCreated()
     {
-        $this->refreshProjects();
-        $this->closeModal();
+        if ($this->projectCreatedEventReceived) {
+            $this->refreshProjects();
+            $this->closeModal();
+            $this->projectCreatedEventReceived = false; // Resetear
+        }
     }
     public function mount($organization)
     {
@@ -35,6 +39,7 @@ class ProjectList extends Component
     public function openModal()
     {
         $this->isModalOpen = true;
+        $this->projectCreatedEventReceived = false; // << Importante
     }
 
     public function closeModal()

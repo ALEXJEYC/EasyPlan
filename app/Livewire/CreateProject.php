@@ -70,6 +70,7 @@ class CreateProject extends Component
         // $this->dispatch('refreshProjectList');
         $this->dispatch('projectCreated');	
         $this->dispatch('chatCreated');
+            $this->dispatch('projectCreated', $project->id);
 
 
         $this->reset(['name', 'description', 'image', 'members']);
