@@ -70,8 +70,8 @@
 
 @guest
 <!-- Si no está autenticado -->
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-    <div class="w-full max-w-md p-6 rounded-xl bg-white dark:bg-gray-800 shadow-lg">
+<div >
+    <div >
         {{ $slot }}
     </div>
 </div>
