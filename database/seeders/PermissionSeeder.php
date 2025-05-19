@@ -12,14 +12,17 @@ class PermissionSeeder extends Seeder
     public function run()
     {
         $permisos = [
-            'eliminar_organizacion',
-            'asignar_tareas',
-            'eliminar_usuarios',
-            'agregar_usuarios',
-            'editar_tareas',
-            'recibir_tareas',
-            'puede_tener_tareas',
-            'transferir_organizacion'
+            // 'eliminar_organizacion',
+            // 'asignar_tareas',
+            // 'agregar_usuarios',
+            // 'editar_tareas',
+            // 'recibir_tareas',
+            // 'puede_tener_tareas',
+            // 'transferir_organizacion',
+            // 'editar_permisos_de_usuarios',
+            // 'crear_proyectos',
+            'add_members',
+            'remove_members',
         ];
         
 
