@@ -2,11 +2,11 @@
     <h2 class="text-xl font-semibold mb-4">Chats</h2>
 
     @if ($chats->isEmpty())
-        <p class="text-gray-500">No hay chats disponibles para esta organización.</p>
+        <p class="text-gray-500 dark:bg-gray-800">No hay chats disponibles para esta organización.</p>
     @else
         <!-- Chat Grupal Principal -->
-        <div class="mb-4 p-4 border rounded bg-blue-50">
-            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Chat Grupal Organización</h3>
+        <div class="mb-4 p-4 border rounded bg-blue-50 dark:bg-gray-800 ">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white ">Chat Grupal Organización</h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">Este es el chat principal de la organización.</p>
             <a href="{{ route('chat.show', $chats->first()) }}" class="text-blue-600 underline">Ir al chat grupal</a>
         </div>

@@ -13,8 +13,9 @@
     <!-- Controles de usuario -->
     <div class="flex items-center space-x-4">
         <!-- Cambiar Tema -->
-        <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-105 transition">
-            <span id="theme-icon">🌞</span>
+        <button id="theme-toggle" type="button" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-105 transition">
+            <span id="theme-icon-light" class="hidden">🌞</span>
+            <span id="theme-icon-dark" class="hidden">🌙</span>
         </button>
 
         <!-- Editar Perfil -->
@@ -31,17 +32,45 @@
 </nav>
 
 <script>
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-    const html = document.documentElement;
-
-    themeToggle.addEventListener('click', () => {
-        if (html.classList.contains('dark')) {
-            html.classList.remove('dark');
-            themeIcon.textContent = '🌞';
-        } else {
+    // Función para aplicar el tema (sincroniza con el script del head)
+    function applyTheme(theme) {
+        const html = document.documentElement;
+        const themeIconLight = document.getElementById('theme-icon-light');
+        const themeIconDark = document.getElementById('theme-icon-dark');
+        
+        if (theme === 'dark') {
             html.classList.add('dark');
-            themeIcon.textContent = '🌙';
+            themeIconLight.classList.add('hidden');
+            themeIconDark.classList.remove('hidden');
+        } else {
+            html.classList.remove('dark');
+            themeIconDark.classList.add('hidden');
+            themeIconLight.classList.remove('hidden');
+        }
+    }
+
+    // Inicializar iconos según el tema actual
+    function initThemeIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        document.getElementById(isDark ? 'theme-icon-dark' : 'theme-icon-light').classList.remove('hidden');
+    }
+
+    // Evento para cambiar el tema
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        const html = document.documentElement;
+        const newTheme = html.classList.contains('dark') ? 'light' : 'dark';
+        
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+    });
+
+    // Escuchar cambios en la preferencia del sistema
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+            applyTheme(e.matches ? 'dark' : 'light');
         }
     });
+
+    // Inicializar iconos al cargar
+    document.addEventListener('DOMContentLoaded', initThemeIcons);
 </script>

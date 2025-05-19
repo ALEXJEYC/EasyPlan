@@ -1,6 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Script de inicialización del tema DEBE SER LO PRIMERO -->
+    <script>
+        // Bloque de script crítico (ejecución inmediata)
+        (function() {
+            try {
+                var savedTheme = localStorage.getItem('theme');
+                var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var theme = savedTheme || (systemDark ? 'dark' : 'light');
+                
+                // Aplicar clase dark inmediatamente
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+                
+                // Guardar preferencia del sistema si no hay tema guardado
+                if (!savedTheme) {
+                    localStorage.setItem('theme', systemDark ? 'dark' : 'light');
+                }
+            } catch(e) { console.error('Error setting theme:', e); }
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyPlan</title>
@@ -38,12 +60,9 @@
         <x-layouts.navbarleft />
     </aside>
      
-
-
-
     <!-- Contenido Principal -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Navigation superior (el botón hamburguesa va aquí) -->
+        <!-- Navigation superior -->
         <x-layouts.navigation />
 
         <!-- Contenido -->
@@ -56,8 +75,8 @@
 
 @guest
 <!-- Si no está autenticado -->
-<div >
-    <div >
+<div>
+    <div>
         {{ $slot }}
     </div>
 </div>

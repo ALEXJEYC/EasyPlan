@@ -1,15 +1,19 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <!-- Botón para crear un nuevo proyecto -->
-    <div class="p-4 border rounded bg-blue-50 flex items-center justify-center cursor-pointer hover:bg-blue-100 transition" wire:click="openModal">
-        <span class="text-4xl font-bold text-blue-600">+</span>
-    </div>
+<div class="p-4 border rounded 
+            bg-blue-50 hover:bg-blue-100 
+            dark:bg-blue-900 dark:hover:bg-blue-800 
+            flex items-center justify-center cursor-pointer transition" 
+     wire:click="openModal">
+    <span class="text-4xl font-bold text-blue-600 dark:text-white">+</span>
+</div>
         <!-- Modal para crear un proyecto -->
         @if ($isModalOpen)
-            <div class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-                <div class="bg-white p-6 rounded shadow-lg w-1/2">
+            <div class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50 ">
+                <div class="bg-white p-6 rounded shadow-lg w-1/2 dark:bg-gray-800">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold">Crear Nuevo Proyecto</h2>
-                        <button type="button" wire:click="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+                        <h2 class="text-xl font-bold  dark:text-white">Crear Nuevo Proyecto</h2>
+                        <button type="button" wire:click="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl font-bold ">&times;</button>
                     </div>
 
                     <livewire:create-project :organization="$organization" />
