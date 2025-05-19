@@ -31,9 +31,6 @@
         x-transition:leave-start="opacity-100 translate-x-0"
         x-transition:leave-end="opacity-0 -translate-x-10"
     >
-        <!-- <button @click="sidebarOpen = false" class="text-gray-500 hover:text-gray-900 dark:hover:text-white mb-4">
-            <i class="fas fa-times"></i> Cerrar
-        </button> -->
         <x-layouts.navbarleft />
     </aside>
 
@@ -42,16 +39,6 @@
         <x-layouts.navbarleft />
     </aside>
      
-    <!-- <aside class="hidden md:block fixed left-6 top-28 h-[calc(100vh-7rem)] w-64 bg-white dark:bg-gray-800 shadow-lg rounded-xl p-4 z-10">
-    <x-layouts.navbarleft />
-</aside> -->
-
-
-
-    <!-- Contenido Principal -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Navigation superior (el botón hamburguesa va aquí) -->
-        <x-layouts.navigation />
 
 
 
