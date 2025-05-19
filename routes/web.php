@@ -86,14 +86,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/organizations/{organization}', [OrganizationController::class, 'show'])->name('organizations.show');
     Route::get('/organizations/{organization}/chats', [ChatController::class, 'index'])->name('chats.index');
     Route::post('/organizations/{organization}/sync-chat-members', [OrganizationController::class, 'syncChatMembers'])->name('organizations.syncChatMembers');
-
-    Route::post('/organizations/{organization}/add-member', [OrganizationController::class, 'addMember'])->name('organizations.addMember');
-        // 🆕 Nuevas rutas:
-    Route::delete('/organizations/{organization}/remove-member/{user}', [OrganizationController::class, 'removeMember'])->name('organizations.removeMember');
-    Route::put('/organizations/{organization}/update-role/{user}', [OrganizationController::class, 'updateMemberRole'])->name('organizations.updateMemberRole');
     Route::delete('/organizations/{organization}', [OrganizationController::class, 'destroy'])->name('organizations.destroy');
-
     Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chat.show');
+    // 
+    // Route::post('/organizations/{organization}/add-member', [OrganizationController::class, 'addMember'])->name('organizations.addMember');
+    // Route::delete('/organizations/{organization}/remove-member/{user}', [OrganizationController::class, 'removeMember'])->name('organizations.removeMember');
+
+    Route::put('/organizations/{organization}/update-role/{user}', [OrganizationController::class, 'updateMemberRole'])->name('organizations.updateMemberRole');
+
+
+    // Route::post('/organizations/{organization}/add-member', [OrganizationController::class, 'addMember'])->name('organizations.addMember');
+        // 🆕 Nuevas rutas:
+    // Route::delete('/organizations/{organization}/remove-member/{user}', [OrganizationController::class, 'removeMember'])->name('organizations.removeMember');
+    // Route::put('/organizations/{organization}/update-role/{user}', [OrganizationController::class, 'updateMemberRole'])->name('organizations.updateMemberRole');
+    // Route::post('/organizations/{organization}/members', [OrganizationController::class, 'addMember'])->name('organizations.addMember');
     
     // Route::post('/chats/{chat}/typing', [ChatController::class, 'sendTypingEvent'])->name('chat.typing');
 });

@@ -6,52 +6,80 @@ use App\Models\CustomRole;
 use App\Models\Organization;
 use App\Models\User;
 use App\Models\Permission;
+use App\Models\Membership;
 use Livewire\Component;
-
+use Illuminate\Support\Facades\Gate;
+use App\Helpers\PermissionsHelper;
 
 class CreateRole extends Component
 {
     public Organization $organization;
-    public $users = [];
-    // public $roles = [];
-    public $members = [];
-    public $ownerId;
-    public $canManageMembers = false;
-
-    public $user_id = '';
-    public $custom_role_id = '';
+    // public array $permissions = [
+    //     'canAddMembers' => false,
+    //     'canRemoveMembers' => false,
+    // ];
+    
+    // Propiedades para manejo de roles
     public $newRoleName = '';
     public $allPermissions = [];
     public $selectedPermissions = [];
-    public $selectedUserForRole = null;
-    public $showTransferModal = false;
-    public $memberToRemove;
+    
+    // Propiedades para manejo de miembros
+    public $users = [];
+    public $memberships = [];
+    public $roles = [];
+    public $ownerId;
+    
+    // Formulario para agregar miembros
+    public $userToAdd = null;
+    public $roleToAssign = null;
+    
+    // Estado para UI
+    public $showAddMemberModal = false;
+    public $showRemoveConfirmation = false;
+    public $memberToRemove = null;
 
-    public function openTransferModal($membershipId)
-    {
-        $this->memberToRemove = $membershipId;
-        $this->showTransferModal = true;
-    }
-
-    public function closeTransferModal()
-    {
-        $this->showTransferModal = false;
-        $this->memberToRemove = null;
-    }
-
-    public function mount(Organization $organization)
+    public function mount(Organization $organization, 
+    // array $permissions
+    )
     {
         $this->organization = $organization;
-        $this->users = User::where('id', '!=', auth()->id())->get(); // Excluir al owner
-        $this->allPermissions = Permission::all();
-            $this->ownerId = $organization->owner_id; // o como tengas el dato
-
+        // $this->permissions = $permissions;
+        $this->ownerId = $organization->ownerRelation->user_id;
+        
+        $this->loadData();
     }
 
+    protected function loadData()
+    {
+        $this->users = User::whereNotIn('id', 
+            $this->organization->members->pluck('id')->push($this->ownerId)
+        )->get();
+        
+        $this->memberships = $this->organization->memberships()
+            ->with(['user', 'customRole'])
+            ->get();
+            
+        $this->roles = $this->organization->customRoles()
+            ->where('name', '!=', 'owner')  // ← Excluir rol owner
+            ->get();
+        $this->allPermissions = Permission::all();
+    }
+    public function getCanAddMembersProperty(): bool {
+        return PermissionsHelper::getFor(auth()->user(), $this->organization)['canAddMembers'];
+    }
+
+    public function getCanRemoveMembersProperty(): bool {
+        return PermissionsHelper::getFor(auth()->user(), $this->organization)['canRemoveMembers'];
+    }
+
+    // Creación de roles
     public function createRole()
     {
         $this->validate([
-            'newRoleName' => 'required|string|max:255',
+            'newRoleName' => 'required|string|max:255|unique:custom_roles,name,NULL,id,organization_id,'.$this->organization->id,
+            'selectedPermissions' => 'nullable|array',
+            'selectedPermissions.*' => 'exists:permissions,id'
         ]);
 
         $role = CustomRole::create([
@@ -64,89 +92,81 @@ class CreateRole extends Component
         }
 
         $this->reset(['newRoleName', 'selectedPermissions']);
-        session()->flash('message', 'Rol y permisos creados exitosamente.');
+        $this->loadData(); // Recargar datos
+        
+        $this->dispatch('notify', type: 'success', message: 'Rol creado exitosamente.');
+    }
+
+    // Asignación de roles a usuarios
+    public function assignRoleToUser($membershipId, $roleId)
+    {
+    validator(['roleId' => $roleId], [
+        'roleId' => 'required|exists:custom_roles,id',
+    ])->validate();
+
+        Membership::where('id', $membershipId)
+            ->update(['custom_role_id' => $roleId]);
+
+        $this->loadData();
+        $this->dispatch('notify', type: 'success', message: 'Rol asignado exitosamente.');
+    }
+
+    // Agregar miembros
+    public function openAddMemberModal()
+    {
+        $this->reset(['userToAdd', 'roleToAssign']);
+        $this->showAddMemberModal = true;
     }
 
     public function addMember()
     {
         $this->validate([
-            'user_id' => 'required|exists:users,id',
-            'custom_role_id' => 'nullable|exists:custom_roles,id',
+            'userToAdd' => 'required|exists:users,id',
+            'roleToAssign' => 'nullable|exists:custom_roles,id'
         ]);
 
-        // Verificar si el usuario ya es miembro de la organización
-        $exists = $this->organization->memberships()
-            ->where('user_id', $this->user_id)
-            ->exists();
-
-        if ($exists) {
-            session()->flash('error', 'El usuario ya es miembro de la organización.');
+        // Verificar si el usuario ya es miembro
+        if ($this->organization->members()->where('user_id', $this->userToAdd)->exists()) {
+            $this->dispatch('notify', type: 'error', message: 'El usuario ya es miembro de esta organización.');
             return;
         }
 
-        $this->organization->memberships()->create([
-            'user_id' => $this->user_id,
-            'custom_role_id' => $this->custom_role_id ?: null,
+        // Agregar el miembro
+        $this->organization->members()->attach($this->userToAdd, [
+            'custom_role_id' => $this->roleToAssign
         ]);
 
-        session()->flash('message', 'Miembro agregado exitosamente.');
-        $this->reset(['user_id', 'custom_role_id']);
+        $this->showAddMemberModal = false;
+        $this->loadData();
+        $this->dispatch('notify', type: 'success', message: 'Miembro agregado exitosamente.');
     }
 
-    public function removeMember($membershipId)
+    // Eliminar miembros
+    public function confirmRemoveMember($membershipId)
     {
-        $membership = $this->organization->memberships()->findOrFail($membershipId);
+        $this->memberToRemove = $membershipId;
+        $this->showRemoveConfirmation = true;
+    }
 
-        // Verifica si es el owner
-        $isOwner = $this->organization->owner->user_id === $membership->user_id;
-
-        if ($isOwner) {
-            session()->flash('error', 'No puedes eliminar al propietario de la organización.');
+    public function removeMember()
+    {
+        $membership = Membership::findOrFail($this->memberToRemove);
+        
+        // Verificar que no sea el owner
+        if ($membership->user_id == $this->ownerId) {
+            $this->dispatch('notify', type: 'error', message: 'No puedes eliminar al dueño de la organización.');
             return;
         }
 
         $membership->delete();
-        session()->flash('message', 'Miembro eliminado.');
+        
+        $this->showRemoveConfirmation = false;
+        $this->loadData();
+        $this->dispatch('notify', type: 'success', message: 'Miembro eliminado exitosamente.');
     }
-
-    public function assignRoleToUser()
-    {
-        $this->validate([
-            'selectedUserForRole' => 'required|exists:users,id',
-            'custom_role_id' => 'required|exists:custom_roles,id',
-        ]);
-
-        $this->organization->memberships()
-            ->where('user_id', $this->selectedUserForRole)
-            ->update([
-                'custom_role_id' => $this->custom_role_id,
-            ]);
-
-        $this->reset(['selectedUserForRole', 'custom_role_id']);
-        session()->flash('message', 'Rol asignado exitosamente.');
-    }
-
 
     public function render()
     {
-        // $this->users = User::where('id', '!=', auth()->id())->get();
-        $user = auth()->user();
-        $canCreateRoles = $user->hasPermissionInOrganization('create_roles', $this->organization->id);
-        $canAddUsers = $user->hasPermissionInOrganization('add_users', $this->organization->id);
-
-
-        return view('livewire.organization.create-role', [
-            'memberships' => $this->organization->memberships()->with(['user', 'customRole'])->get(),
-            'roles' => $this->organization->customRoles,
-            'users' => $this->users,
-            'allPermissions' => $this->allPermissions,
-            'canCreateRoles' => $canCreateRoles,
-            'canAddUsers' => $canAddUsers,
-            'canManageMembers' => $this->canManageMembers,
-            // 'members' => $this->organization->memberships()->with('user', 'customRole')->get(),
-        ]);
+        return view('livewire.organization.create-role');
     }
-
-
-
 }
