@@ -11,17 +11,35 @@ class OrganizationPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function manageMembers(User $user, Organization $organization)
-    {
-        return $organization->members->contains($user) &&
-            $user->hasPermissionTo('agregar_usuarios');
-    }
+    // public function manageMembers(User $user, Organization $organization)
+    // {
+    //     return $organization->members->contains($user) &&
+    //         $user->hasPermissionTo('agregar_usuarios');
+    // }
 
     public function delete(User $user, Organization $organization)
     {
         return $organization->members->contains($user) &&
             $user->hasPermissionTo('eliminar_organizacion');
     }
+    // public function manageMembers(User $user, Organization $organization)
+    // {
+    //     return $organization->members->contains($user) &&
+    //         $user->hasPermissionInOrganization('agregar_usuarios', $organization->id);
+    // }
+    public function manageAddMembers(User $user, Organization $organization): bool
+    {
+        return $organization->isOwner($user) || 
+            $user->hasPermissionInOrganization('add_members', $organization->id);
+    }
+
+    public function manageRemoveMembers(User $user, Organization $organization): bool
+    {
+        return $organization->isOwner($user) || 
+            $user->hasPermissionInOrganization('remove_members', $organization->id);
+    }
+
+
 
     public function viewAny(User $user): bool
     {
