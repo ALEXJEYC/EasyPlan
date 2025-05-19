@@ -72,7 +72,10 @@ class CreateRole extends Component
     public function getCanRemoveMembersProperty(): bool {
         return PermissionsHelper::getFor(auth()->user(), $this->organization)['canRemoveMembers'];
     }
-
+    public function getCanManageRolesProperty(): bool
+    {
+        return PermissionsHelper::getFor(auth()->user(), $this->organization)['canManageRoles'];
+    }
     // Creación de roles
     public function createRole()
     {
@@ -100,6 +103,10 @@ class CreateRole extends Component
     // Asignación de roles a usuarios
     public function assignRoleToUser($membershipId, $roleId)
     {
+            if (!$this->canManageRoles) {
+        abort(403, 'No tienes permiso para gestionar roles');
+    }
+
     validator(['roleId' => $roleId], [
         'roleId' => 'required|exists:custom_roles,id',
     ])->validate();

@@ -66,47 +66,51 @@
             </span>
         </div>
 
-        <!-- Lista de miembros -->
-        <div class="space-y-3">
-            @foreach($memberships as $membership)
-                <div class="border rounded-lg p-4 hover:shadow-md transition-shadow flex justify-between items-center">
-                    <div class="flex items-center space-x-4">
-                        <div class="bg-gray-100 p-3 rounded-full">
-                            <i class="fas fa-user text-gray-500"></i>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-gray-800">{{ $membership->user->name }}</p>
-                            <p class="text-sm text-gray-500">{{ $membership->user->email }}</p>
-                        </div>
+    <!-- Lista de miembros -->
+    <div class="space-y-3">
+        @foreach($memberships as $membership)
+            <div class="border rounded-lg p-4 hover:shadow-md transition-shadow flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-gray-100 p-3 rounded-full">
+                        <i class="fas fa-user text-gray-500"></i>
                     </div>
-                    @if(!$organization->isOwner($membership->user))
-                    <div class="flex items-center space-x-3">
-                        <select wire:change="assignRoleToUser({{ $membership->id }}, $event.target.value)" 
-                                class="border rounded px-3 py-1 focus:ring-2 focus:ring-blue-500"
-                                @disabled(!$this->canAddMembers)>
-                            <option value="">Sin rol</option>
-                            @foreach($roles as $role)
-                                <option value="{{ $role->id }}" 
-                                    {{ $membership->custom_role_id == $role->id ? 'selected' : '' }}>
-                                    {{ $role->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div>
+                        <p class="font-semibold text-gray-800">{{ $membership->user->name }}</p>
+                        <p class="text-sm text-gray-500">{{ $membership->user->email }}</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    @if($organization->isOwner($membership->user))
+                        <span class="text-gray-500">Owner</span>
+                    @else
+                        @if($this->canManageRoles)
+                            <select wire:change="assignRoleToUser({{ $membership->id }}, $event.target.value)" 
+                                    class="border rounded px-3 py-1 focus:ring-2 focus:ring-blue-500">
+                                <option value="">Sin rol</option>
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->id }}" 
+                                        {{ $membership->custom_role_id == $role->id ? 'selected' : '' }}>
+                                        {{ $role->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         @else
-                            <span>Owner</span>
+                            <span class="text-gray-500">{{ $membership->customRole?->name ?? 'Sin rol' }}</span>
                         @endif
-                        
+
                         @if($this->canRemoveMembers && $membership->user_id != $ownerId)
                             <button wire:click="confirmRemoveMember({{ $membership->id }})" 
                                     class="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         @endif
-                    </div>
+                    @endif
                 </div>
-            @endforeach
-        </div>
+            </div>
+        @endforeach
     </div>
+</div>
 
     
     

@@ -38,6 +38,11 @@ class OrganizationPolicy
         return $organization->isOwner($user) || 
             $user->hasPermissionInOrganization('remove_members', $organization->id);
     }
+    public function manageRoles(User $user, Organization $org): bool
+    {
+        return $org->isOwner($user) || 
+            $user->hasPermissionInOrganization('manage_roles', $org->id);
+    }
 
 
 

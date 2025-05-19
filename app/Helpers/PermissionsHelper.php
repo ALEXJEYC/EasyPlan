@@ -12,6 +12,7 @@ class PermissionsHelper
         return [
             'canAddMembers' => $user->hasPermissionInOrganization('add_members', $organization->id),
             'canRemoveMembers' => $user->hasPermissionInOrganization('remove_members', $organization->id),
+            'canManageRoles' => $user->hasPermissionInOrganization('manage_roles', $organization->id),
         ];
     }
     public static function userHasPermission(User $user, Organization $org, string $permission): bool {
