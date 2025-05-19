@@ -1,39 +1,27 @@
-
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
-
-    <!-- Mensaje de bienvenida -->
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    Bienvenido a EasyPlan. Aquí puedes gestionar tus proyectos, chatear en tiempo real y más.
-                </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Bienvenida -->
+        <x-card class="mb-8">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">Bienvenido a EasyPlan</h1>
+                <p class="text-gray-600 dark:text-gray-300">Gestiona tus proyectos, colabora con tu equipo y aumenta tu productividad.</p>
             </div>
+        </x-card>
+
+        <!-- Contenido organizado en grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Crear organización -->
+            <x-card class="md:col-span-2">
+                <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Crear Nueva Organización</h2>
+                <livewire:create-organization />
+                <x-flash-message />
+            </x-card>
+
+            <!-- Lista de organizaciones -->
+            <x-card class="md:col-span-2">
+                <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Mis Organizaciones</h2>
+                <livewire:organization-list />
+            </x-card>
         </div>
-    </div>
-
-    <!-- Componente para crear organización -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-bold mb-4">Crear Nueva Organización</h2>
-        
-        <!-- Mensaje de éxito -->
-        @if (session()->has('message'))
-            <div class="mb-4 p-4 bg-green-100 text-green-800 rounded">
-                {{ session('message') }}
-            </div>
-        @endif
-
-        <livewire:create-organization />
-    </div>
-
-    <!-- Lista de organizaciones -->
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-6 mb-12">
-        <h2 class="text-xl font-bold mb-4">Mis Organizaciones</h2>
-        <livewire:organization-list />
     </div>
 </x-app-layout>

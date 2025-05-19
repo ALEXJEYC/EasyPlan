@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<x-app-layout>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ tab: 'description' }" x-cloak>
         <h1 class="text-2xl font-bold mb-6">{{ $organization->name }}</h1>
 
@@ -65,5 +63,4 @@
             'organization' => $organization,
         ], key($organization->id))
         </div>
-
-@endsection
+</x-app-layout>
