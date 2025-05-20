@@ -11,3 +11,27 @@
 .hover\:shadow-md:hover {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
+
+.upload-area {
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: #3b82f6;
+}
+
+.upload-area.drag-over {
+    background-color: #f0f9ff;
+    border-color: #3b82f6;
+}
+
+/* Previsualización de imagen */
+.image-preview {
+    max-height: 200px;
+    object-fit: contain;
+}
+
+/* Barra de progreso */
+.upload-progress {
+    transition: width 0.3s ease;
+}

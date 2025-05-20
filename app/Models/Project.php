@@ -6,12 +6,35 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Project extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
 
     protected $fillable = ['organization_id', 'name', 'description', 'status'];
+
+public function registerMediaCollections(): void
+{
+    $this->addMediaCollection('images')
+         ->useDisk('public')
+         ->singleFile()
+         ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif'])
+         ->registerMediaConversions(function (Media $media) {
+             $this->addMediaConversion('thumb')
+                  ->width(368)
+                  ->height(232)
+                  ->sharpen(10);
+         });
+}
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this
+            ->addMediaConversion('thumb')
+            ->width(368)
+            ->height(232)
+            ->sharpen(10);
+    }
 
     public function organization()
     {

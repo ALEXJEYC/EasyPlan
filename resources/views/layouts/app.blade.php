@@ -41,7 +41,7 @@
     
     <!-- Menú lateral flotante (móviles) -->
     <aside 
-     style="top: 120px; left: 30px; width: 270px;"
+     style="top: 100px; left: 10px; width: 270px;"
         x-show="sidebarOpen" 
         @click.away="sidebarOpen = false"
            class="fixed z-30 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 transition-transform transform duration-300 md:hidden"
