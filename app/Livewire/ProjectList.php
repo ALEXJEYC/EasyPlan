@@ -10,36 +10,27 @@ class ProjectList extends Component
     public $isModalOpen = false;
     public $organization;
     public $projects;
-    public $projectCreatedEventReceived = false; 
-    protected $listeners = ['projectCreated' => 'refreshProjects'];
-    public function handleProjectCreated()
-    {
-        if ($this->projectCreatedEventReceived) {
-            $this->refreshProjects();
-            $this->closeModal();
-            $this->projectCreatedEventReceived = false; // Resetear
-        }
-    }
+    
+    protected $listeners = ['projectCreated' => 'handleProjectCreated'];
+    
     public function mount($organization)
     {
         $this->organization = $organization;
         $this->loadProjects();
     }
 
-        public function loadProjects()
-        {
-            $this->projects = $this->organization
-                ->projects()
-                ->forUser(auth()->id())
-                ->latest()
-                ->get();
-        }
-
+    public function loadProjects()
+    {
+        $this->projects = $this->organization
+            ->projects()
+            ->forUser(auth()->id())
+            ->latest()
+            ->get();
+    }
 
     public function openModal()
     {
         $this->isModalOpen = true;
-        $this->projectCreatedEventReceived = false; // << Importante
     }
 
     public function closeModal()
@@ -47,17 +38,14 @@ class ProjectList extends Component
         $this->isModalOpen = false;
     }
 
-
-    public function refreshProjects()
+    public function handleProjectCreated($projectId)
     {
-        $this->projects = $this->organization->projects()->latest()->get();
-        $this->isModalOpen = false;
+        $this->loadProjects();
+        $this->closeModal();
     }
 
-    public function render() {
-        return view('livewire.project-list', [
-            'projects' => $this->projects,
-        ]);
+    public function render()
+    {
+        return view('livewire.project-list');
     }
-
 }
