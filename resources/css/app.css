@@ -35,3 +35,16 @@
 .upload-progress {
     transition: width 0.3s ease;
 }
+.dark * {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Scrollbar personalizada para modales */
+.scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.grid {
+    grid-auto-flow: dense;
+}

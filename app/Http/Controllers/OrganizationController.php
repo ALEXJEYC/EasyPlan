@@ -16,6 +16,10 @@ class OrganizationController extends Controller
         $chats = $organization->chats()->whereHas('users', function ($query) {
             $query->where('users.id', auth()->id());
         })->get();
+        $archivedProjects = $organization->projects()
+                   ->where('status', 'archived')
+                   ->with('media')
+                   ->get();
 
         $users = User::whereNotIn('id', $organization->members->pluck('id'))->get();
         $user = auth()->user();
