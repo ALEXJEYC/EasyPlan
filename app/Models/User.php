@@ -72,22 +72,6 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Project::class, 'project_user')->withTimestamps();
     }
-    // tabla quue relaciona usuarios y tareas
-    public function taskAssignments()
-    {
-        return $this->hasMany(TaskAssignment::class);
-    }
-    //tabla que relaciona los usarios y quien la revisa
-
-    public function taskReviews()
-    {
-        return $this->hasMany(TaskReview::class, 'reviewer_id');
-    }
-    // tabla que relaciona los usuarios y las tareas que asigna
-    public function tasksAssigned()
-    {
-        return $this->hasMany(Task::class, 'assigned_by');
-    }
     public function ownedOrganizations()
     {
         return $this->hasMany(OrganizationOwner::class);
@@ -97,31 +81,16 @@ class User extends Authenticatable
         return $this->belongsToMany(Task::class)->withTimestamps()->withPivot('status');
     }
 
-    // public function hasPermissionInOrganization($permissionName, $organizationId)
-    // {
-    //     $membership = $this->memberships()
-    //         ->where('organization_id', $organizationId)
-    //         ->first();
+    public function taskEvidences()
+    {
+        return $this->hasMany(TaskEvidence::class);
+    }
 
-    //     if (!$membership || !$membership->customRole) {
-    //         return false;
-    //     }
+    public function reviewedTasks()
+    {
+        return $this->hasMany(TaskReview::class, 'reviewer_id');
+    }
 
-    //     return $membership->customRole->permissions->contains('name', $permissionName);
-    // }
-    // public function hasPermissionInOrganization(string $permissionName, int $organizationId): bool
-    // {
-    //     $membership = $this->memberships()->where('organization_id', $organizationId)->first();
-        
-    //     if (!$membership || !$membership->customRole) {
-    //         return false;
-    //     }
-
-    //     return in_array($permissionName, $membership->customRole->permissions ?? []);
-    // }
-
-
-// En User.php
     public function hasPermissionInOrganization(string $permission, int $organizationId): bool
     {
         $organization = Organization::find($organizationId);

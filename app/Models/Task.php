@@ -14,6 +14,7 @@ class Task extends Model
         'status',
         'deadline',
         'assigned_by',
+        'completed_at',
     ];
 
     // Relación con Project
@@ -21,27 +22,24 @@ class Task extends Model
     {
         return $this->belongsTo(Project::class);
     }
-
-    // Relación con User que asignó la tarea
-    public function assignedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'assigned_by');
-    }
-
-    // Asignaciones de la tarea (usuarios que la tienen asignada)
-    public function taskAssignments(): HasMany
-    {
-        return $this->hasMany(TaskAssignment::class);
-    }
-
-    // Revisiones de la tarea
-    public function taskReviews(): HasMany
-    {
-        return $this->hasMany(TaskReview::class);
-    }
-    //usuarios asignados a la tarea
-    public function assignedUsers()
+    public function users()
     {
         return $this->belongsToMany(User::class)->withTimestamps()->withPivot('status');
     }
+    public function evidences()
+    {
+        return $this->hasMany(TaskEvidence::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(TaskReview::class);
+    }
+
+    public function approvedReview()
+    {
+        return $this->hasOne(TaskReview::class)->where('status', 'approved');
+    }
+
+
 }
