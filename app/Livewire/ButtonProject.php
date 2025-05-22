@@ -13,6 +13,7 @@ use Livewire\WithFileUploads;
 // use Intervention\Image\ImageManager;
 // use Intervention\Image\Drivers\Gd\Driver;
 // use Illuminate\Support\Facades\Storage;
+use App\Helpers\PermissionsHelper;
 
 class ButtonProject extends Component
 {
@@ -34,6 +35,9 @@ class ButtonProject extends Component
         'members' => 'array|min:1',
         'members.*' => 'exists:users,id',
     ];
+    public function getCanCreateProjectProperty(): bool {
+        return PermissionsHelper::getFor(auth()->user(), $this->organization)['canCreateProject'];
+    }
 
     public function getOrganizationMembersProperty()
     {

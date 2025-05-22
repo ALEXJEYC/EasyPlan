@@ -35,7 +35,9 @@
         <!-- Pestaña: Proyectos -->
         <div x-show="tab === 'projects'" class="mb-8">
             <h2 class="text-xl font-semibold mb-4">Proyectos</h2>
+               
             <livewire:button-project :organization="$organization" />
+        
             <livewire:project-list :organization="$organization" />
 
             <!-- Proyectos archivados -->

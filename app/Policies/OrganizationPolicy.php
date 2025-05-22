@@ -43,6 +43,12 @@ class OrganizationPolicy
         return $org->isOwner($user) || 
             $user->hasPermissionInOrganization('manage_roles', $org->id);
     }
+    public function manageCreateProject(User $user, Organization $org): bool
+    {
+        return $org->isOwner($user) || 
+            $user->hasPermissionInOrganization('create_project', $org->id);
+    }
+
 
 
 
