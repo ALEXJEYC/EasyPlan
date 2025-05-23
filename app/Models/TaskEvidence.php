@@ -9,15 +9,15 @@ class TaskEvidence extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['task_id', 'user_id', 'file_path', 'file_name'];
+    protected $fillable = [
+        'task_user_id',
+        'file_path',
+        'file_name'
+    ];
 
-    public function task()
+    // Relación con TaskUser
+    public function taskUser()
     {
-        return $this->belongsTo(Task::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(TaskUser::class);
     }
 }

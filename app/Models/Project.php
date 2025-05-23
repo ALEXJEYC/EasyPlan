@@ -44,6 +44,11 @@ public function registerMediaCollections(): void
     {
         return $this->hasMany(Chat::class);
     }
+    // deberia ser hasOne ya que solo es un chat por proyecto
+        public function getChatAttribute()
+    {
+        return $this->chats()->where('type', 'project')->first();
+    }
     public function users()
     {
         return $this->belongsToMany(User::class, 'project_user')->withTimestamps();
@@ -57,6 +62,10 @@ public function registerMediaCollections(): void
         return $query->whereHas('users', function ($q) use ($userId) {
             $q->where('users.id', $userId);
         });
+    }
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
     }
     // protected static function boot()
     // {

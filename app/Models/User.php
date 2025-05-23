@@ -76,9 +76,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(OrganizationOwner::class);
     }
+    // public function tasks()
+    // {
+    //     return $this->belongsToMany(Task::class, 'task_user')->withTimestamps()->withPivot('observation');
+    // }
+    // public function assignedTasks()
+    // {
+    //     return $this->belongsToMany(Task::class)->withTimestamps()->withPivot('status');
+    // }
     public function assignedTasks()
     {
-        return $this->belongsToMany(Task::class)->withTimestamps()->withPivot('status');
+        return $this->belongsToMany(Task::class, 'task_user')
+                    ->withTimestamps()
+                    ->withPivot('observation', 'status');
     }
 
     public function taskEvidences()
@@ -89,6 +99,10 @@ class User extends Authenticatable
     public function reviewedTasks()
     {
         return $this->hasMany(TaskReview::class, 'reviewer_id');
+    }
+    public function feedbacksSent()
+    {
+        return $this->hasMany(TaskFeedback::class, 'from_user_id');
     }
 
     public function hasPermissionInOrganization(string $permission, int $organizationId): bool

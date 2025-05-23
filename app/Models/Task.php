@@ -14,7 +14,9 @@ class Task extends Model
         'status',
         'deadline',
         'assigned_by',
-        'completed_at',
+        'status',
+        'priority',
+        'redy',
     ];
 
     // Relación con Project
@@ -22,24 +24,23 @@ class Task extends Model
     {
         return $this->belongsTo(Project::class);
     }
-    public function users()
+        public function users()
     {
-        return $this->belongsToMany(User::class)->withTimestamps()->withPivot('status');
+        return $this->belongsToMany(User::class)->withTimestamps()->withPivot('status', 'id');
     }
     public function evidences()
     {
         return $this->hasMany(TaskEvidence::class);
     }
-
     public function reviews()
     {
         return $this->hasMany(TaskReview::class);
     }
-
-    public function approvedReview()
+    public function taskUsers()
     {
-        return $this->hasOne(TaskReview::class)->where('status', 'approved');
+        return $this->belongsToManyMany(TaskUser::class, 'task_user');
     }
+
 
 
 }

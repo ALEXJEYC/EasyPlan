@@ -20,7 +20,7 @@ class TaskFeedback extends Model
         return $this->belongsTo(TaskUser::class);
     }
 
-    public function fromUser()
+    public function author()
     {
         return $this->belongsTo(User::class, 'from_user_id');
     }

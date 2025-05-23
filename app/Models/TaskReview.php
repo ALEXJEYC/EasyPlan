@@ -7,19 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class TaskReview extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'task_id',
+        'task_user_id',
         'reviewer_id',
         'status',
         'feedback',
+        'reviewed_at'
     ];
 
-    public function task(): BelongsTo
+    // Relación con TaskUser
+    public function taskUser()
     {
-        return $this->belongsTo(Task::class);
+        return $this->belongsTo(TaskUser::class);
     }
 
-    public function reviewer(): BelongsTo
+    // Relación con User (revisor)
+    public function reviewer()
     {
         return $this->belongsTo(User::class, 'reviewer_id');
     }
