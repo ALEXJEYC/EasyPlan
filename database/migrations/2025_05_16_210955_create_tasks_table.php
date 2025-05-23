@@ -16,10 +16,11 @@ return new class extends Migration
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
-            // $table->timestamp('completed_at')->nullable();
-            $table->date('deadline')->nullable();
-            $table->foreignId('assigned_by')->nullable()->constrained('users')->onDelete('set null');
-
+             $table->date('deadline')->nullable(); //fecha limite que se le da a la tarea
+            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
+            $table->enum('ready', ['yes', 'no'])->default('no'); // si la tarea esta lista para ser revisada
+            $table->enum('priority', ['low', 'medium', 'high'])->default('medium'); // prioridad de la tarea
+            
             $table->timestamps();
         });
 

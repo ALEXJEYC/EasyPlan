@@ -9,8 +9,6 @@ return new class extends Migration {
     {
         Schema::create('task_evidences', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('task_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             //relacionar evidencia con usuario
             $table->foreignId('task_user_id')->constrained('task_user')->onDelete('cascade'); // usuario que subio la tarea
             $table->string('file_path');

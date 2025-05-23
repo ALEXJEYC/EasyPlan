@@ -15,10 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('task_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['pending', 'submitted'])->default('pending');
-            // $table->timestamp('submitted_at')->nullable();
-            $table->timestamp('completed_at')->nullable();
+            $table->enum('status', ['pending', 'in_progress', 'submitted', 'rejected', 'approved', ])->default('pending');
             $table->text('observation')->nullable();
+            $table->timestamp('submitted_at')->nullable();
             $table->timestamps();
         });
     }

@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('task_reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
-            $table->foreignId('reviewer_id')->constrained('users')->onDelete('cascade'); // usuario que revisa la tarea
-            $table->timestamp('reviewed_at')->nullable(); // cuando fue revisada la tarea
-            $table->foreignId('task_user_id')->constrained('task_user')->onDelete('cascade'); 
-            $table->unique('task_user_id'); 
-            $table->enum('status', ['approved', 'rejected', 'needs_revision'])->default('needs_revision');
+            $table->foreignId('task_user_id')->constrained('task_user')->onDelete('cascade');
+            $table->foreignId('reviewer_id')->constrained('users')->onDelete('cascade');
+            $table->enum('status', ['approved', 'rejected', 'needs_revision']);
+            $table->text('feedback')->nullable();
+            $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();
         });
 
