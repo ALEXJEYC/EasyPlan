@@ -18,18 +18,20 @@ class ProjectTasks extends Component
     public $deadline;
     public $assignedTo = [];
     public $selectedTasks = [];
+    public $observation = '';
 
     public function mount(Project $project)
     {
         $this->project = $project;
     }
-    public function rules() // ✅ Añadí validación
+    public function rules()
     {
         return [
             'title' => 'required|min:3',
             'description' => 'nullable|string',
             'deadline' => 'required|date',
-            'assignedTo' => 'required|array|min:1'
+            'assignedTo' => 'required|array|min:1',
+            'observation' => 'nullable|string|max:500'
         ];
     }
 public function createTask()
@@ -67,28 +69,33 @@ public function createTask()
         session()->flash('error', 'Error al crear la tarea: ' . $e->getMessage());
     }}
     // Agrega este método a tu componente Livewire
-public function submitSelectedTasks()
-{
-    if (empty($this->selectedTasks)) {
-        $this->dispatch('show-toast', type: 'error', message: 'No hay tareas seleccionadas');
-        return;
-    }
-
-    try {
-        // Actualizar el estado de las tareas seleccionadas
-        TaskUser::whereIn('id', $this->selectedTasks)
-                ->update(['status' => 'pending']);
+    public function submitSelectedTasks()
+    {
+        $this->validate(['observation' => 'nullable|string|max:500']);
         
-        // Limpiar selección
-        $this->selectedTasks = [];
-        
-        // Emitir eventos
-        $this->dispatch('show-toast', type: 'success', message: 'Solicitud enviada correctamente');
-        $this->dispatch('tasks-submitted'); // Para actualizar otras partes si es necesario
-    } catch (\Exception $e) {
-        $this->dispatch('show-toast', type: 'error', message: 'Error al enviar solicitud: '.$e->getMessage());
+        try {
+            TaskUser::whereIn('id', $this->selectedTasks)
+                ->update([
+                    'status' => 'submitted',
+                    'submitted_at' => now(),
+                    'observation' => $this->observation,
+                ]);
+            
+            $this->selectedTasks = [];
+            $this->observation = '';
+            
+            $this->dispatch('notify', 
+                type: 'success', 
+                message: 'Solicitudes enviadas para revisión'
+            );
+            
+        } catch (\Exception $e) {
+            $this->dispatch('notify', 
+                type: 'error', 
+                message: 'Error: '.$e->getMessage()
+            );
+        }
     }
-}
     public function approveTask()
     {
         $taskUser = TaskUser::find($this->taskUserId);
