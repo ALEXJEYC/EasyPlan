@@ -83,5 +83,21 @@
 @endguest
 
 @livewireScripts
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    anime({
+        targets: '.logo-line',
+        strokeDashoffset: [anime.setDashoffset, 0],
+        easing: 'easeInOutSine',
+        duration: 3000,
+        direction: 'alternate',
+        loop: true
+    });
+});
+</script>
+
+
 </body>
 </html>
