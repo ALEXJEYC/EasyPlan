@@ -34,9 +34,8 @@ class TaskUser extends Model
     // Relación con evidencias
     public function evidences()
     {
-        return $this->hasMany(TaskEvidence::class);
+        return $this->hasMany(TaskEvidence::class, 'task_user_id');
     }
-
     // Relación con revisiones
     public function reviews()
     {
