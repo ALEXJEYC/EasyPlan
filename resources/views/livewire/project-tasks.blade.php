@@ -1,7 +1,5 @@
 <div>
     <!-- Formulario para Crear Tareas -->
-<div>
-    <!-- Formulario para Crear Tareas -->
     <div class="mb-8 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
         <h2 class="text-xl font-semibold mb-4">Crear Nueva Tarea</h2>
         <form wire:submit.prevent="createTask">
@@ -45,6 +43,7 @@
             @endif
         </form>
     </div>
+
     <!-- Listado de Tareas -->
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
         <h2 class="text-xl font-semibold mb-4">Tareas Activas</h2>
@@ -84,16 +83,30 @@
         </table>
 
         <!-- Botón para Enviar Solicitud -->
-@if (count($selectedTasks) > 0)
-    <button wire:click="submitSelectedTasks" 
-            class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
-        <div wire:loading.remove wire:target="submitSelectedTasks">
-            Enviar Solicitud ({{ count($selectedTasks) }})
-        </div>
-        <div wire:loading wire:target="submitSelectedTasks">
-            Enviando...
-        </div>
-    </button>
-@endif
+        @if (count($selectedTasks) > 0)
+            <button wire:click="submitSelectedTasks" 
+                    class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+                <div wire:loading.remove wire:target="submitSelectedTasks">
+                    Enviar Solicitud ({{ count($selectedTasks) }})
+                </div>
+                <div wire:loading wire:target="submitSelectedTasks">
+                    Enviando...
+                </div>
+            </button>
+        @endif
     </div>
+    @push('scripts')
+    <script>
+        Livewire.on('show-toast', (data) => {
+            Toastify({
+                text: data.message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: data.type === 'success' ? '#10B981' : '#EF4444',
+            }).showToast();
+        });
+    </script>
+    @endpush
 </div>
