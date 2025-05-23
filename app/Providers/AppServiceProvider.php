@@ -7,7 +7,8 @@ use App\Livewire\CreateProject;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
-use Intervention\Image\ImageServiceProvider; // 👈 Añade esto
+use Intervention\Image\ImageServiceProvider; 
+use App\Services\Task\TaskStatusService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,8 +17,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Registra el ServiceProvider de Intervention Image (opcional, pero recomendado)
- 
+        $this->app->singleton(TaskStatusService::class, function ($app) {
+            return new TaskStatusService();
+        });
+    
     }
     
 
