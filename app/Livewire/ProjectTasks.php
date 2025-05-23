@@ -19,6 +19,7 @@ class ProjectTasks extends Component
     public $assignedTo = [];
     public $selectedTasks = [];
     public $observation = '';
+    protected $listeners = ['tasksUpdated' => 'render'];
 
     public function mount(Project $project)
     {
@@ -29,7 +30,7 @@ class ProjectTasks extends Component
         return [
             'title' => 'required|min:3',
             'description' => 'nullable|string',
-            'deadline' => 'required|date',
+            'deadline' => 'required|date|after_or_equal:today', 
             'assignedTo' => 'required|array|min:1',
             'observation' => 'nullable|string|max:500'
         ];
@@ -112,8 +113,8 @@ public function toggleTask($taskUserId)
 
     public function render()
     {
-        $tasks = $this->project->tasks()->with(['users' => function ($query) {
-            $query->wherePivot('status', '!=', 'approved');
+        $tasks = $this->project->tasks()->with(['users' => function($query) {
+            $query->whereNotIn('status', ['approved', 'submitted']);
         }])->get();
 
         $users = User::whereHas('organizations', function ($query) {
@@ -122,4 +123,5 @@ public function toggleTask($taskUserId)
 
         return view('livewire.project-tasks', compact('tasks', 'users'));
     }
+
 }
