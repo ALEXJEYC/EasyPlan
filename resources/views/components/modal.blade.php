@@ -1,28 +1,24 @@
-@props([
-    'name',
-    'show' => false,
-    'maxWidth' => '2xl'
-])
+@props(['name' => null])
 
 @php
+$id = $attributes->get('id', $name);
+
+$attributes = $attributes->except(['id', 'name']);
+
 $maxWidth = [
     'sm' => 'sm:max-w-sm',
     'md' => 'sm:max-w-md',
     'lg' => 'sm:max-w-lg',
     'xl' => 'sm:max-w-xl',
     '2xl' => 'sm:max-w-2xl',
-][$maxWidth];
+][$maxWidth ?? '2xl'];
 @endphp
 
 <div
     x-data="{
-        show: @js($show),
+        show: @entangle($attributes->wire('model')),
         focusables() {
-            // All focusable element types...
-            let selector = 'a, button, input:not([type=\'hidden\']), textarea, select, details, [tabindex]:not([tabindex=\'-1\'])'
-            return [...$el.querySelectorAll(selector)]
-                // All non-disabled elements...
-                .filter(el => ! el.hasAttribute('disabled'))
+            // ... (resto de tu código JavaScript)
         },
         firstFocusable() { return this.focusables()[0] },
         lastFocusable() { return this.focusables().slice(-1)[0] },
@@ -39,14 +35,15 @@ $maxWidth = [
             document.body.classList.remove('overflow-y-hidden');
         }
     })"
-    x-on:open-modal.window="$event.detail == '{{ $name }}' ? show = true : null"
+    x-on:open-modal.window="$event.detail == '{{ $name }}' ? show = true : null" 
     x-on:close.stop="show = false"
     x-on:keydown.escape.window="show = false"
     x-on:keydown.tab.prevent="$event.shiftKey || nextFocusable().focus()"
     x-on:keydown.shift.tab.prevent="prevFocusable().focus()"
     x-show="show"
+    id="{{ $id }}"
     class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50"
-    style="display: {{ $show ? 'block' : 'none' }};"
+    style="display: none;"
 >
     <div
         x-show="show"
