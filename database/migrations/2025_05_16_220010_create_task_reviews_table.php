@@ -9,18 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('task_reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('task_user_id')->constrained('task_user')->onDelete('cascade');
-            $table->foreignId('reviewer_id')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['approved', 'rejected', 'needs_revision']);
-            $table->text('feedback')->nullable();
-            $table->timestamp('reviewed_at')->nullable();
+            $table->string('status'); // approved, rejected, needs_revision
+            $table->text('comments')->nullable();
+            $table->foreignId('reviewed_by')->constrained('users');
             $table->timestamps();
         });
-
     }
 
     /**

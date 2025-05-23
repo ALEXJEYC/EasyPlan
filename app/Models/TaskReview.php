@@ -11,10 +11,10 @@ class TaskReview extends Model
 
     protected $fillable = [
         'task_user_id',
-        'reviewer_id',
+        'reviewed_by',
         'status',
-        'feedback',
-        'reviewed_at'
+        'comments',
+        // 'reviewed_at'
     ];
 
     // Relación con TaskUser
@@ -26,6 +26,12 @@ class TaskReview extends Model
     // Relación con User (revisor)
     public function reviewer()
     {
-        return $this->belongsTo(User::class, 'reviewer_id');
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
+    // public function task()
+    // {
+    //     return $this->belongsTo(Task::class);
+    // }
+    
+
 }
