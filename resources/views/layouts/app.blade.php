@@ -27,7 +27,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyPlan</title>
 
-    @vite('resources/css/app.css')
+    @vite(['resources/js/app.js', 'resources/css/app.css'])
     @livewireStyles
 
     <!-- Font Awesome y Alpine -->
@@ -84,6 +84,7 @@
 
 @livewireScripts
 <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -98,6 +99,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
-
+@stack('scripts')
 </body>
 </html>

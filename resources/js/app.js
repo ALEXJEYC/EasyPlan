@@ -1,4 +1,5 @@
 import './bootstrap';
+import './sweetalert';  // Esta línea debe estar al inicio
 import './chat';
 import anime from 'animejs';
 
