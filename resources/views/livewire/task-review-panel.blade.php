@@ -1,14 +1,13 @@
 <div class="space-y-6">
-    <!-- Sección de Métricas -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         @foreach($statusMetrics as $status => $count)
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md transition-shadow duration-300 hover:shadow-lg">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        {{ \App\Enums\TaskStatus::tryFrom($status)?->name }} {{-- Corregido aquí --}}
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                        {{ \App\Enums\TaskStatus::tryFrom($status)?->name }}
                     </p>
-                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $count }}</p>
+                    <p class="text-3xl font-semibold text-gray-900 dark:text-white">{{ $count }}</p>
                 </div>
                 @livewire('task-status-badge', ['status' => $status])
             </div>
@@ -17,19 +16,17 @@
     </div>
 
     <!-- Panel de Revisión -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg transition-all duration-300">
-        <!-- Encabezado... (se mantiene igual) -->
-
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg transition-all duration-300">
         <div class="overflow-x-auto">
             <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <!-- Columnas... (se mantienen igual) -->
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @foreach ($tasks as $taskUser)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    @foreach ($tasks as $taskUser )
+                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                            {{ $taskUser->task->title }}
+                            {{ $taskUser ->task->title }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                             <div class="flex items-center">

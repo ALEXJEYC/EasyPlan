@@ -42,4 +42,8 @@ class TaskUser extends Model
         return $this->hasMany(TaskReview::class, 'task_user_id');
 
     }
+    public function latestReview()
+{
+    return $this->hasOne(TaskReview::class)->latestOfMany();
+}
 }

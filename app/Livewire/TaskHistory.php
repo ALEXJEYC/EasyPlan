@@ -13,13 +13,18 @@ class TaskHistory extends Component
     public function mount(Project $project)
     {
         $this->project = $project;
+        
     }
     public function render()
     {
-        $tasks = TaskUser::whereHas('task', function ($query) {
-            $query->where('project_id', $this->project->id);
-        })->where('status', 'approved')->get();
+        $tasks = TaskUser::with(['user', 'task', 'latestReview.reviewer'])
+            ->whereHas('task', function ($query) {
+                $query->where('project_id', $this->project->id);
+            })
+            ->where('status', 'approved')
+            ->get();
 
         return view('livewire.task-history', compact('tasks'));
     }
+
 }
