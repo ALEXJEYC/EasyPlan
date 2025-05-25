@@ -84,6 +84,7 @@
     function moveProgressText(newChartType) {
         const progressText = document.getElementById('progressText');
         const translateX = newChartType === 'bar' ? '170px' : '0px'; // Aumentar el desplazamiento a la derecha
+        progressText.style.transition = 'transform 0.5s ease'; // Añadir transición
         progressText.style.transform = `translateX(${translateX})`;
     }
 
