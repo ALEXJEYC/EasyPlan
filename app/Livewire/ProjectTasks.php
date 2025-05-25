@@ -37,38 +37,30 @@ class ProjectTasks extends Component
     }
 public function createTask()
 {
-    // Depuración - verifica los datos recibidos
-    \Log::debug('Datos del formulario:', [
+    $this->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'deadline' => 'required|date',
+        'assignedTo' => 'required|array|min:1',
+    ]);
+
+    $task = Task::create([
+        'project_id' => $this->project->id, // Reemplaza con el ID del proyecto
         'title' => $this->title,
         'description' => $this->description,
         'deadline' => $this->deadline,
-        'assignedTo' => $this->assignedTo,
-        'project_id' => $this->project->id
+        'created_by' => Auth::id(), // asegúrate de tener este campo
     ]);
 
-    // Valida los datos
-    $this->validate();
+    $task->users()->attach($this->assignedTo);
 
-    try {
-        $task = Task::create([
-            'project_id' => $this->project->id,
-            'title' => $this->title,
-            'description' => $this->description,
-            'deadline' => $this->deadline,
-        ]);
 
-        // Asignar usuarios a la tarea
-        $task->users()->attach($this->assignedTo);
 
-        $this->reset(['title', 'description', 'deadline', 'assignedTo']);
-        $this->dispatch('task-created');
-        
-        // Mensaje de éxito
-        session()->flash('message', 'Tarea creada exitosamente!');
-    } catch (\Exception $e) {
-        \Log::error('Error al crear tarea: ' . $e->getMessage());
-        session()->flash('error', 'Error al crear la tarea: ' . $e->getMessage());
-    }}
+    // Limpia el formulario
+    $this->reset(['title', 'description', 'deadline', 'assignedTo']);
+
+    session()->flash('message', 'Tarea creada exitosamente.');
+}
     // Agrega este método a tu componente Livewire
     public function submitSelectedTasks()
     {
