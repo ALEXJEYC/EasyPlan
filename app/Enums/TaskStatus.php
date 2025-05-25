@@ -39,8 +39,8 @@ enum TaskStatus: string
             self::APPROVED => 'Aprobado',
             self::REJECTED => 'Rechazado',
             self::NEEDS_REVISION => 'Necesita Revisión',
-            self::COMPLETED => 'Completado',
+            self::COMPLETED => 'Completado', // utilizado
         };
     }
 
-}
+}//✅ NO se conecta directamente a la base de datos. Es solo una representación lógica de los estados.
