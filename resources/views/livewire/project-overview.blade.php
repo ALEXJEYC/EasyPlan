@@ -18,26 +18,26 @@
     <!-- Controles de personalización -->
     <div class="flex justify-center gap-4 mb-8">
         <div class="color-picker flex gap-2">
-            <button class="w-6 h-6 rounded-full bg-blue-600 border-2 border-white shadow-md transition-transform hover:scale-125" data-color="#3B82F6"></button>
-            <button class="w-6 h-6 rounded-full bg-emerald-600 border-2 border-white shadow-md transition-transform hover:scale-125" data-color="#10B981"></button>
-            <button class="w-6 h-6 rounded-full bg-purple-600 border-2 border-white shadow-md transition-transform hover:scale-125" data-color="#8B5CF6"></button>
+            <button class="w-6 h-6 rounded-full bg-blue-600 border-2 border-white shadow-md" data-color="#3B82F6"></button>
+            <button class="w-6 h-6 rounded-full bg-emerald-600 border-2 border-white shadow-md" data-color="#10B981"></button>
+            <button class="w-6 h-6 rounded-full bg-purple-600 border-2 border-white shadow-md" data-color="#8B5CF6"></button>
         </div>
         <div class="chart-type flex gap-2">
-            <button class="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm transition-all hover:bg-blue-600 hover:text-white" data-type="doughnut">Dona</button>
-            <button class="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm transition-all hover:bg-blue-600 hover:text-white" data-type="bar">Barras</button>
+            <button class="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm" data-type="doughnut">Dona</button>
+            <button class="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm" data-type="bar">Barras</button>
         </div>
     </div>
 
     <!-- Contenedor del gráfico -->
-    <div class="relative w-80 h-80 mx-auto mb-8 group cursor-pointer"
+    <div class="relative w-80 h-80 mx-auto mb-8 mb-6 group transition-transform duration-500 hover:scale-110 cursor-pointer"
          id="chartContainer"
          onclick="toggleProgress()">
         <div class="absolute inset-0 bg-gradient-to-r from-blue-200 to-blue-100 dark:from-gray-900 dark:to-blue-900/20 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
         
-        <canvas id="progressChart" width="450" height="450" class="relative z-10 transition-transform duration-500 group-hover:scale-110 hover:!scale-125 origin-center"></canvas>
+        <canvas id="progressChart" width="450" height="450" class="relative z-10"></canvas>
 
         <!-- Texto del porcentaje -->
-        <div id="progressText" class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none select-none transition-all duration-500">
+        <div id="progressText" class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none select-none transition-transform duration-300">
             <div class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500 drop-shadow-2xl">
                 <span>0</span><span class="text-3xl">%</span>
             </div>
@@ -70,25 +70,21 @@
         
         document.querySelectorAll('.chart-type button').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const newType = e.target.dataset.type;
-                animateTextTransition(newType);
-                chartType = newType;
-                initChart();
-                animateProgress(currentProgress);
+                const newChartType = e.target.dataset.type;
+                if (newChartType !== chartType) {
+                    moveProgressText(newChartType);
+                    chartType = newChartType;
+                    initChart();
+                    animateProgress(currentProgress);
+                }
             });
         });
     });
 
-    function animateTextTransition(newType) {
+    function moveProgressText(newChartType) {
         const progressText = document.getElementById('progressText');
-        anime({
-            targets: progressText,
-            translateX: newType === 'bar' ? '120%' : '0%',
-            opacity: [0.5, 1],
-            scale: [0.9, 1],
-            duration: 800,
-            easing: 'easeInOutQuad'
-        });
+        const translateX = newChartType === 'bar' ? '170px' : '0px'; // Aumentar el desplazamiento a la derecha
+        progressText.style.transform = `translateX(${translateX})`;
     }
 
     function updateChartColor(newColor) {
@@ -98,10 +94,6 @@
         
         chart.data.datasets[0].backgroundColor[0] = gradient;
         chart.update();
-        
-        // Actualizar gradiente del texto
-        document.querySelector('#progressText div').style.backgroundImage = 
-            `linear-gradient(to right, ${newColor}, ${newColor}DD)`;
     }
 
     function createParticles(event) {
@@ -201,12 +193,7 @@
                     y: {
                         display: chartType === 'bar',
                         beginAtZero: true,
-                        max: 100,
-                        grid: { color: '#f3f4f6' }
-                    },
-                    x: {
-                        display: chartType === 'bar',
-                        grid: { display: false }
+                        max: 100
                     }
                 },
                 plugins: {
@@ -215,45 +202,34 @@
                 }
             }
         });
-
-        // Posicionamiento inicial del texto
-        const progressText = document.getElementById('progressText');
-        if(chartType === 'bar') {
-            progressText.style.transform = 'translateX(120%)';
-            progressText.style.justifyContent = 'flex-start';
-        } else {
-            progressText.style.transform = 'translateX(0)';
-            progressText.style.justifyContent = 'center';
-        }
     }
 </script>
 
 <style>
     #chartContainer {
-        padding: 2rem;
-        margin: 2rem auto;
-        overflow: visible !important;
+        padding: 2rem; /* Aumentar el padding para dar más espacio al gráfico */
     }
 
     #progressChart {
-        margin: -2rem;
-        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        margin: -rem; /* Ajustar el margen para que el gráfico sobresalga más */
     }
 
-    #progressText {
-        width: 40%;
-        right: auto;
-        left: 50%;
-        transform: translateX(-50%);
+    .color-picker button {
+        transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .chart-type button.active {
-        background: #3B82F6 !important;
-        color: white !important;
+    .color-picker button:hover {
+        transform: scale(1.15);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .chart-type button {
+        transition: all 0.2s;
     }
 
     .chart-type button:hover {
-        transform: translateY(-2px);
+        background: #3B82F6 !important;
+        color: white !important;
     }
 </style>
 @endpush
