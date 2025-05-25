@@ -18,10 +18,15 @@ class Task extends Model
         'status',
         'deadline',
         'assigned_by',
-        'status',
+        // 'status',
         'priority',
-        'redy',
+        'ready',
     ];
+    protected $casts = [
+    'deadline' => 'datetime',
+    'ready' => 'boolean',
+];
+
 
     // Relación con Project
     public function project(): BelongsTo
@@ -30,7 +35,9 @@ class Task extends Model
     }
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'task_user')->withTimestamps()->withPivot('status', 'observation', 'submitted_at', 'id');
+        return $this->belongsToMany(User::class, 'task_user')
+        ->withTimestamps()
+        ->withPivot('status', 'observation', 'submitted_at', 'id');
     }
     public function evidences(): HasMany
     {

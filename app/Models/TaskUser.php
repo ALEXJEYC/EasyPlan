@@ -39,6 +39,7 @@ class TaskUser extends Model
     // Relación con revisiones
     public function reviews()
     {
-        return $this->hasMany(TaskReview::class);
+        return $this->hasMany(TaskReview::class, 'task_user_id');
+
     }
 }
