@@ -58,6 +58,8 @@ public function createTask()
 
     // Limpia el formulario
     $this->reset(['title', 'description', 'deadline', 'assignedTo']);
+    // $this->dispatch('tasksUpdated'); //emisor de evento
+
 
     session()->flash('message', 'Tarea creada exitosamente.');
 }
@@ -93,15 +95,40 @@ public function createTask()
     {
         $taskUser = TaskUser::find($this->taskUserId);
         $taskUser->update(['status' => 'approved']);
+        $this->dispatch('tasksUpdated'); 
+        //emisor 
+
     }
-public function toggleTask($taskUserId)
+    public function toggleTask($taskUserId)
+    {
+        if (in_array($taskUserId, $this->selectedTasks)) {
+            $this->selectedTasks = array_diff($this->selectedTasks, [$taskUserId]);
+        } else {
+            $this->selectedTasks[] = $taskUserId;
+        }
+    }
+    public function canResubmit($taskUser)
 {
-    if (in_array($taskUserId, $this->selectedTasks)) {
-        $this->selectedTasks = array_diff($this->selectedTasks, [$taskUserId]);
-    } else {
-        $this->selectedTasks[] = $taskUserId;
-    }
+    return $taskUser->status === TaskStatus::REJECTED->value && $taskUser->user_id === Auth::id();
 }
+
+// public function resubmitTask($taskUserId)
+// {
+//     $taskUser = TaskUser::findOrFail($taskUserId);
+    
+//     if ($taskUser->user_id !== Auth::id()) {
+//         abort(403);
+//     }
+
+//     $taskUser->update([
+//         'status' => TaskStatus::SUBMITTED->value,
+//         'submitted_at' => now(),
+//     ]);
+
+//     $this->dispatch('notify', type: 'success', message: 'Tarea reenviada');
+//     $this->dispatch('tasksUpdated');
+// }
+
 
     public function render()
     {

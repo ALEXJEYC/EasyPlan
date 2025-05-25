@@ -26,28 +26,31 @@ class TaskReviewPanel extends Component
     public $statusMetrics = [];
     public bool $showDetailsModal = false;
     public $tasks;
+    protected $listeners = ['tasksUpdated' => 'loadTasksForReview'];
+
     
     
-    public function boot(TaskStatusService $statusService)
-    {
-        $this->statusService = $statusService;
-    }
+     public function boot(TaskStatusService $statusService)
+     {
+         $this->statusService = $statusService;
+     }
 
-    public function __construct()
-    {
-        $this->taskStatusService = new TaskStatusService();
-    }
-
-
+    
+    
     public function mount(Project $project)
     {
         $this->project = $project;
+        $this->statusService = new TaskStatusService();
         // $this->statusMetrics = $this->statusService->getStatusMetrics($this->project->id);
         $this->loadMetrics();
         $this->loadTasksForReview();
         
     }
-
+    
+    public function __construct()
+    {
+        $this->taskStatusService = new TaskStatusService();
+    }
     public function approveTask(int $taskUserId)
     {
         try {
@@ -112,28 +115,32 @@ public function loadTasksForReview()
     ->with(['task', 'user', 'evidences', 'reviews.reviewer'])
     ->get();
 }
-    public function rejectTask($taskReviewId)
-    {
-        $taskReview = TaskReview::find($taskReviewId);
-        if ($taskReview) {
-            // Actualiza el estado en TaskUser y crea un registro en TaskReview
-            $this->statusService->changeStatus(
-                $taskReview->taskUser,
-                TaskStatus::REJECTED->value,
-                'Tarea rechazada'
-            );
-            $this->refreshMetrics();
-            $this->loadTasksForReview();
-             // Emitir evento
-        }
+public function rejectTask($taskUserId)
+{
+    $taskUser = TaskUser::find($taskUserId);
+
+    if ($taskUser && $taskUser->status !== TaskStatus::REJECTED->value) {
+        $this->statusService->changeStatus(
+            $taskUser,
+            TaskStatus::REJECTED->value,
+            'Tarea rechazada'
+        );
+
+        $this->refreshMetrics();
+        $this->loadTasksForReview();
+
+        session()->flash('message', 'Tarea rechazada correctamente.');
+    } else {
+        session()->flash('error', 'La tarea ya está rechazada.');
     }
+}
 
     
     private function refreshMetrics()
     {
         // Asegúrate de que este método use la relación anidada si es necesario
         // O si tu servicio ya maneja la lógica correcta
-        // $this->statusMetrics = $this->statusService->getStatusMetrics($this->project->id);
+        $this->statusMetrics = $this->statusService->getStatusMetrics($this->project->id);
         $this->loadMetrics(); // Reutiliza el método loadMetrics corregido
         $this->dispatch('tasksUpdated');
     }

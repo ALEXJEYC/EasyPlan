@@ -42,15 +42,24 @@ class TaskStatusService
     }
 
     // Este método debe obtener las métricas de la tabla task_user
-    public function getStatusMetrics(int $projectId): array
-    {
-        return TaskUser::whereHas('task', fn($q) => $q->where('project_id', $projectId))
-            ->select('status', DB::raw('count(*) as count'))
-            ->groupBy('status')
-            ->pluck('count', 'status')
-            ->toArray();
+public function getStatusMetrics(int $projectId): array
+{
+    $query = TaskUser::whereHas('task', fn($q) => $q->where('project_id', $projectId))
+        ->select('status', DB::raw('count(*) as count'))
+        ->groupBy('status')
+        ->pluck('count', 'status')
+        ->toArray();
+
+    $allStatuses = collect(TaskStatus::cases())->pluck('value');
+    
+    $metrics = [];
+
+    foreach ($allStatuses as $status) {
+        $metrics[$status] = $query[$status] ?? 0;
     }
 
+    return $metrics;
+}
     // Este método no parece usarse en los componentes proporcionados,
     // pero si se usa en TaskController, necesitaría ser implementado.
     // public function updateTaskStatusBasedOnReview(int $taskUserId, string $reviewStatus): void
@@ -62,5 +71,13 @@ class TaskStatusService
     //     // Si reviewStatus es 'needs_revision', newStatus es 'needs_revision' o 'in_progress' (depende del flujo)
     //     // Luego llamas a $this->changeStatus($taskUser, $newStatus);
     // }
+
+
+
 }
+
+
+//✅ SÍ se conecta con la base de datos al:
+// Actualizar el modelo TaskUser.
+// Crear un nuevo TaskReview.
 
