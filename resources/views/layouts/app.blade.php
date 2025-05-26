@@ -21,17 +21,18 @@
                 }
             } catch(e) { console.error('Error setting theme:', e); }
         })();
-    </script>
+        </script>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EasyPlan</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasyPlan</title>
 
-    @vite('resources/css/app.css')
-    @livewireStyles
+@vite('resources/css/app.css')
+@livewireStyles
 
-    <!-- Font Awesome y Alpine -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Font Awesome y Alpine -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
@@ -87,6 +88,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
