@@ -157,7 +157,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
                             <span class="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
-                                {{ $task->task->title }}
+                                {{ $task->title }}
                             </span>
                         </div>
                     </td>
@@ -168,8 +168,8 @@
                         <div class="flex items-center">
                             <div class="relative shrink-0">
                                 <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" 
-                                     src="{{ $task->latestReview->reviewer->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($task->latestReview->reviewer->name).'&color=7F9CF5&background=EBF4FF' }}" 
-                                     alt="{{ $task->latestReview->reviewer->name }}">
+                                     src="{{ $task->reviews->first()->reviewer->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($task->latestReview->reviewer->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                     alt="{{ $task->reviews->first()->reviewer->name }}">
                                 <div class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-400 rounded-full border-2 border-white dark:border-gray-800"></div>
                             </div>
                             <div class="ml-3">
@@ -186,14 +186,17 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
                             <div class="relative shrink-0">
+                                @foreach($task->taskUsers as $taskUser)
                                 <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" 
-                                     src="{{ $task->user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($task->user->name).'&color=7F9CF5&background=EBF4FF' }}" 
-                                     alt="{{ $task->user->name }}">
+                                     src="{{ $taskUser->user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($taskUser->user->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                     alt="{{ $taskUser->user->name }}">
+                                       @endforeach
                                 <div class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-blue-400 rounded-full border-2 border-white dark:border-gray-800"></div>
+                           
                             </div>
                             <div class="ml-3">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $task->user->name }}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $task->user->email }}</div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $taskUser->user->name }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $taskUser->user->email }}</div>
                             </div>
                         </div>
                     </td>
