@@ -162,19 +162,24 @@
                         </div>
                     </td>
 
-                    <!-- Aprobador Cell -->
                     <td class="px-6 py-4 whitespace-nowrap">
-                        @if ($task->latestReview && $task->latestReview->reviewer)
-                        <div class="flex items-center">
+                        @if($task->reviewer)
+                        <div class="flex items-center group relative">
+                            <!-- Imagen del revisor -->
                             <div class="relative shrink-0">
                                 <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" 
-                                     src="{{ $task->reviews->first()->reviewer->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($task->latestReview->reviewer->name).'&color=7F9CF5&background=EBF4FF' }}" 
-                                     alt="{{ $task->reviews->first()->reviewer->name }}">
+                                     src="{{ $task->reviewer->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($task->reviewer->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                     alt="{{ $task->reviewer->name }}">
                                 <div class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-400 rounded-full border-2 border-white dark:border-gray-800"></div>
                             </div>
+                            <!-- Tooltip hover -->
                             <div class="ml-3">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $task->latestReview->reviewer->name }}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">Aprobado</div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ $task->reviewer->name }}
+                                </div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ $task->reviewer->email }}
+                                </div>
                             </div>
                         </div>
                         @else
@@ -182,21 +187,69 @@
                         @endif
                     </td>
 
-                    <!-- Asignado a Cell -->
+                    <!-- Asignado a Cell - Nuevo diseño con avatares apilados -->
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <div class="relative shrink-0">
-                                @foreach($task->taskUsers as $taskUser)
-                                <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" 
-                                     src="{{ $taskUser->user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($taskUser->user->name).'&color=7F9CF5&background=EBF4FF' }}" 
-                                     alt="{{ $taskUser->user->name }}">
-                                       @endforeach
-                                <div class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-blue-400 rounded-full border-2 border-white dark:border-gray-800"></div>
-                           
+                            <!-- Contenedor de avatares -->
+                            <div class="flex -space-x-2 relative group">
+                                @foreach($task->users as $user)
+                                <div class="relative hover:-translate-y-2 transition-transform duration-200">
+                                    <img 
+                                        class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm cursor-pointer z-{{ $loop->remaining + 1 }}"
+                                        src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                        alt="{{ $user->name }}"
+                                        x-data="{ showTooltip: false }"
+                                        @mouseover="showTooltip = true"
+                                        @mouseleave="showTooltip = false"
+                                    >
+                                    <!-- Tooltip flotante -->
+                                    <div 
+                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-white px-2 py-1 rounded-lg text-xs whitespace-nowrap"
+                                        x-show="showTooltip"
+                                        x-cloak
+                                    >
+                                        <div class="font-medium">{{ $user->name }}</div>
+                                        <div class="text-gray-300">{{ $user->email }}</div>
+                                    </div>
+                                </div>
+                                @endforeach
                             </div>
-                            <div class="ml-3">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $taskUser->user->name }}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $taskUser->user->email }}</div>
+                            
+                            <!-- Menú desplegable "Ver todos" -->
+                            <div class="ml-3 relative" x-data="{ open: false }">
+                                <button 
+                                    @click="open = !open"
+                                    class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center"
+                                >
+                                    <span class="mr-1">Ver todos</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                
+                                <!-- Lista desplegable -->
+                                <div 
+                                    x-show="open"
+                                    @click.away="open = false"
+                                    class="absolute z-10 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700"
+                                    x-cloak
+                                >
+                                    <div class="p-2 max-h-60 overflow-y-auto">
+                                        @foreach($task->users as $user)
+                                        <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                                            <img 
+                                                class="h-6 w-6 rounded-full mr-2" 
+                                                src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                                alt="{{ $user->name }}"
+                                            >
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $user->email }}</div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </td>
@@ -229,3 +282,20 @@
         {{ $tasks->links('vendor.pagination.tailwind') }}
     </div>
 </div>
+@push('styles')
+<style>
+    /* Animación personalizada para el hover de los avatares */
+    .hover\:-translate-y-2 {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    /* Mejora de z-index para superposición */
+    .z-1 { z-index: 1; }
+    .z-2 { z-index: 2; }
+    .z-3 { z-index: 3; }
+    .z-4 { z-index: 4; }
+    
+    /* Estilos para el tooltip */
+    [x-cloak] { display: none !important; }
+</style>
+@endpush
