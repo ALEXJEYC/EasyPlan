@@ -49,12 +49,11 @@ public function calculateProgress()
     if ($totalTasks === 0) {
         $this->progress = 0;
     } else {
-        // Porcentaje de tareas aprobadas sobre total
         $this->progress = round(($approvedTasks / $totalTasks) * 100);
     }
 
-    // Enviar evento para actualizar el gráfico si usas JS en frontend
-    $this->dispatch('updateChartProgress', ['progress' => $this->progress]);
+    // Forzar actualización del componente
+    $this->dispatch('updateChartProgress', progress: $this->progress);
 }
 
     

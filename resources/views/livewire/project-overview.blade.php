@@ -55,7 +55,18 @@
     let currentColor = '#3B82F6';
     let chartType = 'doughnut';
 
-    // Inicialización automática
+    // Escuchar inicialización de Livewire
+    document.addEventListener('livewire:init', () => {
+        // Escuchar evento de actualización de progreso
+        Livewire.on('updateChartProgress', (data) => {
+            if (!isAnimating) {
+                originalProgress = data.progress;
+                animateProgress(data.progress);
+            }
+        });
+    });
+
+    // Inicialización del gráfico
     document.addEventListener('DOMContentLoaded', () => {
         initChart();
         animateProgress(originalProgress);
@@ -83,8 +94,8 @@
 
     function moveProgressText(newChartType) {
         const progressText = document.getElementById('progressText');
-        const translateX = newChartType === 'bar' ? '170px' : '0px'; // Aumentar el desplazamiento a la derecha
-        progressText.style.transition = 'transform 0.5s ease'; // Añadir transición
+        const translateX = newChartType === 'bar' ? '170px' : '0px';
+        progressText.style.transition = 'transform 0.5s ease';
         progressText.style.transform = `translateX(${translateX})`;
     }
 
@@ -123,6 +134,13 @@
 
     function animateProgress(target) {
         isAnimating = true;
+        
+        // Resetear a 0 antes de animar si es una actualización
+        if (target !== currentProgress) {
+            chart.data.datasets[0].data = chartType === 'doughnut' ? [0, 100] : [0];
+            chart.update();
+        }
+        
         anime({
             targets: { value: currentProgress },
             value: target,
