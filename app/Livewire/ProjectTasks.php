@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-
 use Livewire\Component;
 use App\Models\Project;
 use App\Models\TaskUser;
@@ -16,59 +15,85 @@ use Illuminate\Support\Facades\DB;
 class ProjectTasks extends Component
 {
     use WithPagination;
+    
     public $project;
     public $title;
     public $description;
     public $deadline;
     public $assignedTo = [];
-    public $selectedTasks = [];
     public $observation = '';
-    public $searchTitle = '';
+    public $globalSearch = '';
     public $searchAssignedUser = '';
     public $searchDeadline = '';
-    public $globalSearch = '';
-      protected $listeners = [
+    public $statusFilter = '';
+    public $showSubmissionModal = false;
+    public $selectedTaskId;
+    public $selectedTask;
+
+    protected $listeners = [
         'tasksUpdated' => 'render',
         'taskCreated' => 'render',
         'taskSubmitted' => 'render',
         'taskApproved' => 'render',
         'taskRejected' => 'render',
+        'refresh' => '$refresh'
     ];
+
     protected $paginationTheme = 'tailwind';
-    public $showSubmissionModal = false;
-    public $selectedTaskId;
-    public $selectedTask;
-
-
-        public function clearFilters()
-    {
-        $this->reset(['searchTitle', 'searchAssignedUser', 'searchApprover', 'searchDate']);
-        $this->resetPage();
-    }
-
-    public function updating($property)
-    {
-        // Resetear paginación para cualquier cambio en los filtros
-        if (in_array($property, ['searchTitle', 'searchAssignedUser', 'searchApprover', 'searchDate'])) {
-            $this->resetPage();
-        }
-    }
-
 
     public function mount(Project $project)
     {
         $this->project = $project;
     }
+
     public function rules()
     {
         return [
             'title' => 'required|min:3',
             'description' => 'nullable|string',
-            'deadline' => 'required|date|after_or_equal:today', 
+            'deadline' => 'required|date|after_or_equal:today',
             'assignedTo' => 'required|array|min:1',
             'observation' => 'nullable|string|max:500'
         ];
     }
+
+    public function clearFilters()
+    {
+        $this->reset([
+            'globalSearch', 
+            'searchAssignedUser', 
+            'searchDeadline', 
+            'statusFilter'
+        ]);
+        $this->resetPage();
+    }
+
+    public function updating($property)
+    {
+        if (in_array($property, [
+            'globalSearch',
+            'searchAssignedUser',
+            'searchDeadline',
+            'statusFilter'
+        ])) {
+            $this->resetPage();
+        }
+    }
+
+    // public function mount(Project $project)
+    // {
+    //     $this->project = $project;
+    // }
+    // public function rules()
+    // {
+    //     return [
+    //         'title' => 'required|min:3',
+    //         'description' => 'nullable|string',
+    //         'deadline' => 'required|date|after_or_equal:today', 
+    //         'assignedTo' => 'required|array|min:1',
+    //         'observation' => 'nullable|string|max:500'
+    //     ];
+    // }
     public function createTask()
     {
         $this->validate([
@@ -189,45 +214,45 @@ public function prepareSubmit($taskId)
     $this->showSubmissionModal = true;
 }
 
-
     public function render()
     {
-        $tasks = $this->project->tasks()
-        ->with(['users' => function ($query) {
-            $query->where('status', \App\Enums\TaskStatus::REJECTED->value); // Filtra solo rechazados
-        }]);
-        $tasksQuery = Task::with(['users' => function ($query) {
-            $query->whereNotIn('status', ['approved', 'submitted']);
-        }])
-        ->where('project_id', $this->project->id);
+        $tasksQuery = $this->project->tasks()
+            ->with(['users', 'submittedBy'])
+            ->whereIn('status', [TaskStatus::PENDING->value, TaskStatus::REJECTED->value]);
 
-        // Filtros simples (puedes mejorar esto aún más si lo deseas)
-        if (!empty($this->searchTitle)) {
-            $tasksQuery->where('title', 'like', '%' . $this->searchTitle . '%');
+        // Búsqueda global
+        if (!empty($this->globalSearch)) {
+            $searchTerm = '%' . $this->globalSearch . '%';
+            $tasksQuery->where(function ($query) use ($searchTerm) {
+                $query->where('title', 'like', $searchTerm)
+                    ->orWhere('description', 'like', $searchTerm)
+                    ->orWhereHas('users', function ($q) use ($searchTerm) {
+                        $q->where('name', 'like', $searchTerm)
+                            ->orWhere('email', 'like', $searchTerm);
+                    });
+            });
         }
 
+        // Filtro por estado
+        if (!empty($this->statusFilter)) {
+            $tasksQuery->where('status', $this->statusFilter);
+        }
+
+        // Filtro por fecha
         if (!empty($this->searchDeadline)) {
             $tasksQuery->whereDate('deadline', $this->searchDeadline);
         }
 
+        // Filtro por usuario asignado
         if (!empty($this->searchAssignedUser)) {
             $tasksQuery->whereHas('users', function ($query) {
                 $query->where('user_id', $this->searchAssignedUser);
             });
         }
 
-        $users = User::whereHas('organizations', function ($query) {
-            $query->where('organization_id', $this->project->organization_id);
-        })->get();
-        
-        $tasks = $this->project->tasks()
-        ->with(['users', 'submittedBy'])
-        ->whereIn('status', [TaskStatus::PENDING->value, TaskStatus::REJECTED->value]) // Mostrar pendientes y rechazadas
-        ->latest()
-        ->paginate(10);
+        $users = $this->project->members()->get();
+        $tasks = $tasksQuery->latest()->paginate(5);
 
         return view('livewire.project-tasks', compact('tasks', 'users'));
     }
-
-
 }

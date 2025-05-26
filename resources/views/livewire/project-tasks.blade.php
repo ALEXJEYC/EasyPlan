@@ -1,11 +1,11 @@
 <div class="space-y-8">
     @php
     use App\Enums\TaskStatus;
-@endphp
+    @endphp
     <!-- Sección de Creación de Tareas -->
-    <div class="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 p-8 rounded-2xl shadow-2xl transition-all duration-300">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+    <div class="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 p-8 rounded-2xl shadow-2xl">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center min-w-[300px]">
                 <svg class="w-6 h-6 mr-2 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                 </svg>
@@ -78,7 +78,7 @@
 
             <div class="flex justify-end">
                 <button type="submit" 
-                        class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center transition-colors duration-300 shadow-lg hover:shadow-xl">
+                        class="hidden md:flex px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl items-center transition-colors duration-300 shadow-lg hover:shadow-xl">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
@@ -88,140 +88,174 @@
         </form>
     </div>
 
-    <!-- Listado de Tareas Activas -->
-    <div class="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 p-8 rounded-2xl shadow-2xl transition-all duration-300">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+<!-- Listado de Tareas Activas -->
+    <div class="bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 p-8 rounded-2xl shadow-2xl">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center mb-6">
                 <svg class="w-6 h-6 mr-2 text-purple-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
                 Tareas Activas
             </h2>
             
-            <!-- Buscador Global (de tu versión) -->
-            <div class="relative w-72">
-                <input type="text" 
-                       wire:model.live.debounce.300ms="globalSearch"
-                       placeholder="Buscar en tareas..."
-                       class="w-full pl-10 pr-8 py-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-            </div>
-        </div>
-
-        <!-- Filtros Combinados -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <!-- Filtro por Estado -->
-            <div class="relative">
-                <select wire:model.live="statusFilter" 
-                        class="w-full pl-10 pr-8 py-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    <option value="">Todos los estados</option>
-                    @foreach(TaskStatus::cases() as $status)
-                    <option value="{{ $status->value }}">{{ $status->name() }}</option>
-                    @endforeach
-                </select>
-                <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                </svg>
-            </div>
-
-            <!-- Filtro por Fecha -->
-            <div class="relative">
-                <input type="date" 
-                    wire:model.live="deadlineFilter"
-                    class="w-full pl-10 pr-8 py-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-            </div>
-
-
-            <!-- Filtro por Asignado -->
-            <div class="relative">
-                <select wire:model.live="assignedFilter" 
-                        class="w-full pl-10 pr-8 py-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    <option value="">Todos los asignados</option>
-                    @foreach($users as $user)
-                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                    @endforeach
-                </select>
-                <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
-            </div>
-        </div>
-
-        <!-- Listado de Tareas en Tarjetas -->
-        <div class="grid grid-cols-1 gap-4">
-            @forelse ($tasks as $task)
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 transition-all hover:shadow-xl">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">{{ $task->title }}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $task->description }}</p>
+            <!-- Filtros y Buscador -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <!-- Botón Limpiar Filtros -->
+                <div class="md:col-span-1">
+                    <button wire:click="clearFilters" 
+                            class="w-full px-4 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl border border-gray-300 dark:border-gray-600 transition-colors flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Limpiar
+                    </button>
+                </div>
+                <!-- Buscador Global -->
+                <div class="md:col-span-2">
+                    <div class="relative">
+                        <input type="text" 
+                               wire:model.live.debounce.300ms="globalSearch"
+                               placeholder="Buscar en tareas..."
+                               class="w-full pl-10 pr-8 py-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
                     </div>
-                    
-                    @if($task->status === TaskStatus::PENDING && $task->users->contains(auth()->id()))
-                        <button wire:click="prepareSubmit({{ $task->id }})" 
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center transition-transform transform hover:scale-105">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                            </svg>
-                            Enviar Tarea
-                        </button>
-                    @endif
-                           <!-- //cambiar color              -->
-                    @if($task->status === TaskStatus::REJECTED && $task->users->contains(auth()->id()))
-                        <button wire:click="prepareSubmit({{ $task->id }})" 
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center transition-transform transform hover:scale-105">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                            </svg>
-                            Volver a enviar Tarea
-                        </button>
-                    @endif
-                    <!-- //agregar mas posibilidades -->
-                    
+                </div>
+                <!-- Filtro por Estado -->
+                <div class="relative">
+                    <select wire:model.live="statusFilter" 
+                            class="w-full pl-10 pr-8 py-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="">Todos los estados</option>
+                        @foreach(TaskStatus::cases() as $status)
+                            <option value="{{ $status->value }}">{{ $status->name() }}</option>
+                        @endforeach
+                    </select>
+                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <!-- Asignados -->
-                    <div>
-                        <p class="font-medium text-gray-700 dark:text-gray-300 mb-2">Asignados:</p>
-                        <div class="flex -space-x-2">
-                            @foreach ($task->users as $user)
-                            <div class="relative group">
-                                <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" 
-                                     src="{{ $user->profile_photo_url }}" 
-                                     alt="{{ $user->name }}"
-                                     title="{{ $user->name }}">
-                                @if($task->submitted_by && $task->submitted_by === $user->id)
-                                <div class="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-0.5">
-                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                    </svg>
-                                </div>
-                                @endif
-                            </div>
-                            @endforeach
-                        </div>
+                <!-- Filtro por Fecha -->
+                <div class="relative">
+                    <input type="date" 
+                        wire:model.live="searchDeadline"
+                        class="w-full pl-10 pr-8 py-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listado de Tareas -->
+        <div class="space-y-4">
+            @forelse ($tasks as $task)
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white truncate">{{ $task->title }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{{ $task->description }}</p>
                     </div>
+                    
+                    <div class="flex-shrink-0 flex gap-2">
+                        @if(($task->status === TaskStatus::PENDING || $task->status === TaskStatus::REJECTED) && $task->users->contains(auth()->id()))
+                            <button wire:click="prepareSubmit({{ $task->id }})" 
+                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center transition-transform transform hover:scale-105">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                </svg>
+                                <span class="hidden md:inline ml-2">Enviar</span>
+                            </button>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm border-t pt-4 border-gray-200 dark:border-gray-700">
+ <!-- Asignado a Cell - Nuevo diseño con avatares apilados -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <!-- Contenedor de avatares -->
+                            <div class="flex -space-x-2 relative group">
+                                @foreach($task->users as $user)
+                                <div class="relative hover:-translate-y-2 transition-transform duration-200">
+                                    <img 
+                                        class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm cursor-pointer z-{{ $loop->remaining + 1 }}"
+                                        src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                        alt="{{ $user->name }}"
+                                        x-data="{ showTooltip: false }"
+                                        @mouseover="showTooltip = true"
+                                        @mouseleave="showTooltip = false"
+                                    >
+                                    <!-- Tooltip flotante -->
+                                    <div 
+                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-white px-2 py-1 rounded-lg text-xs whitespace-nowrap"
+                                        x-show="showTooltip"
+                                        x-cloak
+                                    >
+                                        <div class="font-medium">{{ $user->name }}</div>
+                                        <div class="text-gray-300">{{ $user->email }}</div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            
+                            <!-- Menú desplegable "Ver todos" -->
+                            <div class="ml-3 relative" x-data="{ open: false }">
+                                <button 
+                                    @click="open = !open"
+                                    class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center"
+                                >
+                                    <span class="mr-1">Ver todos</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                
+                                <!-- Lista desplegable -->
+                                <div 
+                                    x-show="open"
+                                    @click.away="open = false"
+                                    class="absolute z-10 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700"
+                                    x-cloak
+                                >
+                                    <div class="p-2 max-h-60 overflow-y-auto">
+                                        @foreach($task->users as $user)
+                                        <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                                            <img 
+                                                class="h-6 w-6 rounded-full mr-2" 
+                                                src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                                alt="{{ $user->name }}"
+                                            >
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $user->email }}</div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+         
 
                     <!-- Estado -->
                     <div>
                         <p class="font-medium text-gray-700 dark:text-gray-300 mb-2">Estado:</p>
                         <span class="px-2.5 py-1.5 text-xs font-semibold rounded-full 
-                            @if($task->status === TaskStatus::APPROVED)
-                                bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                            @if($task->status === TaskStatus::PENDING)
+                                bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
                             @elseif($task->status === TaskStatus::SUBMITTED)
                                 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
-                            @else
-                                bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+                            @elseif($task->status === TaskStatus::REJECTED)
+                                bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
                             @endif">
                             {{ $task->status->name() }}
                         </span>
                     </div>
+
 
                     <!-- Fecha Límite -->
                     <div>
