@@ -1,4 +1,4 @@
-<nav class="fixed top-4 left-1/2 transform -translate-x-1/2 w-[95%] md:w-[92%] z-40 bg-white dark:bg-gray-800 shadow-xl rounded-2xl px-6 py-4 flex justify-between items-center transition-all duration-300">
+<nav class="fixed top-4 left-1/2 transform -translate-x-1/2 w-[95%] md:w-[92%] z-10 bg-white dark:bg-gray-800 shadow-xl rounded-2xl px-6 py-4 flex justify-between items-center transition-all duration-300">
     <!-- Botón Hamburguesa (solo en móviles) -->
     <button 
         @click="sidebarOpen = !sidebarOpen" 
