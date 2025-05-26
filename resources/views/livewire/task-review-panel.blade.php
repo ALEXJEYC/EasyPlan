@@ -2,12 +2,18 @@
     <!-- Tarjetas de Estado Mejoradas -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         @php
-            // Obtener todos los estados posibles
-            $allStatuses = \App\Enums\TaskStatus::cases();
+            // Estados específicos a mostrar en el orden deseado
+            $filteredStatuses = [
+                \App\Enums\TaskStatus::PENDING,
+                \App\Enums\TaskStatus::SUBMITTED,
+                \App\Enums\TaskStatus::APPROVED,
+                \App\Enums\TaskStatus::REJECTED
+            ];
+            
             $total = array_sum($statusMetrics);
         @endphp
         
-        @foreach($allStatuses as $status)
+        @foreach($filteredStatuses as $status)
         @php
             $count = $statusMetrics[$status->value] ?? 0;
             $percentage = $total > 0 ? round(($count / $total) * 100, 2) : 0;
@@ -39,7 +45,11 @@
                             @break
                         @endswitch
                         <p class="text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                            {{ $status->name() }}
+                            @if($status->value === \App\Enums\TaskStatus::SUBMITTED->value)
+                                Enviado para Revisión
+                            @else
+                                {{ $status->name() }}
+                            @endif
                         </p>
                     </div>
                     <p class="text-4xl font-bold text-white">{{ $count }}</p>
@@ -93,23 +103,78 @@
                                     <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ Str::limit($task->description, 40) }}</div>
                                 </div>
                             </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex -space-x-2">
-                                @foreach ($task->users as $user)
-                                <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" 
-                                     src="{{ $user->profile_photo_url }}" 
-                                     alt="{{ $user->name }}"
-                                     title="{{ $user->name }}">
+                <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <!-- Contenedor de avatares -->
+                            <div class="flex -space-x-2 relative group">
+                                @foreach($task->users as $user)
+                                <div class="relative hover:-translate-y-2 transition-transform duration-200">
+                                    <img 
+                                        class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm cursor-pointer z-{{ $loop->remaining + 1 }}"
+                                        src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                        alt="{{ $user->name }}"
+                                        x-data="{ showTooltip: false }"
+                                        @mouseover="showTooltip = true"
+                                        @mouseleave="showTooltip = false"
+                                    >
+                                    <!-- Tooltip flotante -->
+                                    <div 
+                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-white px-2 py-1 rounded-lg text-xs whitespace-nowrap"
+                                        x-show="showTooltip"
+                                        x-cloak
+                                    >
+                                        <div class="font-medium">{{ $user->name }}</div>
+                                        <div class="text-gray-300">{{ $user->email }}</div>
+                                    </div>
+                                </div>
                                 @endforeach
                             </div>
-                        </td>
+                            
+                            <!-- Menú desplegable "Ver todos" -->
+                            <div class="ml-3 relative" x-data="{ open: false }">
+                                <button 
+                                    @click="open = !open"
+                                    class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center"
+                                >
+                                    <span class="mr-1">Ver todos</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                
+                                <!-- Lista desplegable -->
+                                <div 
+                                    x-show="open"
+                                    @click.away="open = false"
+                                    class="absolute z-10 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700"
+                                    x-cloak
+                                >
+                                    <div class="p-2 max-h-60 overflow-y-auto">
+                                        @foreach($task->users as $user)
+                                        <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                                            <img 
+                                                class="h-6 w-6 rounded-full mr-2" 
+                                                src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                                alt="{{ $user->name }}"
+                                            >
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $user->email }}</div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 @if($task->submittedBy)
-                                <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800" 
-                                     src="{{ $task->submittedBy->profile_photo_url }}" 
-                                     alt="{{ $task->submittedBy->name }}">
+                                <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" 
+                                             src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                             alt="{{ $user->name }}"
+                                             title="{{ $user->name }}">
                                 <div class="ml-3">
                                     <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $task->submittedBy->name }}</div>
                                     <div class="text-sm text-gray-500 dark:text-gray-400">{{ $task->submitted_at->diffForHumans() }}</div>
