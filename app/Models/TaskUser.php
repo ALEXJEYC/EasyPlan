@@ -46,4 +46,8 @@ class TaskUser extends Model
 {
     return $this->hasOne(TaskReview::class)->latestOfMany();
 }
+public function feedbacks()
+{
+    return $this->hasMany(TaskFeedback::class);
+}
 }
