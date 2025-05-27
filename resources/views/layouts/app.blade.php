@@ -38,33 +38,44 @@
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
 @auth
-<div x-data="{ sidebarOpen: false }" class="flex h-screen relative">
+<div x-data="{ sidebarOpen: false, mobileMenuOpen: false }" class="flex h-screen relative">
     
     <!-- Menú lateral flotante (móviles) -->
-    <aside 
-     style="top: 100px; left: 10px; width: 270px;"
-        x-show="sidebarOpen" 
-        @click.away="sidebarOpen = false"
-           class="fixed z-30 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 transition-transform transform duration-300 md:hidden"
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 -translate-x-10"
-        x-transition:enter-end="opacity-100 translate-x-0"
-        x-transition:leave="transition ease-in duration-300"
-        x-transition:leave-start="opacity-100 translate-x-0"
-        x-transition:leave-end="opacity-0 -translate-x-10"
+<template x-if="sidebarOpen">
+    <div 
+        class="fixed inset-0 z-10 flex items-start justify-start pt-24 pl-4 pr-8 bg-black/40 backdrop-blur-sm md:hidden"
+        @click.self="sidebarOpen = false"
+        x-show="sidebarOpen"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transient:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-init="initLogoAnimation()"
     >
+        <div 
+            class="bg-white dark:bg-gray-800 w-72 rounded-2xl shadow-2xl p-4"
+            x-show="sidebarOpen"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-x-[-100%]"
+            x-transition:enter-end="opacity-100 translate-x-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-x-0"
+            x-transition:leave-end="opacity-0 translate-x-[-100%]"
+        >
+            <x-layouts.navbarleft />
+        </div>
+    </div>
+</template>
+    <!-- Menú lateral desktop -->
+     <aside class="hidden md:block fixed top-28 left-10 h-[calc(95vh-7rem)] w-64 bg-white dark:bg-gray-800 shadow-lg rounded-xl p-4 z-10">
         <x-layouts.navbarleft />
     </aside>
 
-    <!-- Menú lateral fijo (desktop) -->
-     <aside class="hidden md:block fixed top-28 left-12 h-[calc(95vh-7rem)] w-64 bg-white dark:bg-gray-800 shadow-lg rounded-xl p-4 z-10">
-        <x-layouts.navbarleft />
-    </aside>
      
     <!-- Contenido Principal -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <!-- Navigation superior -->
-        <x-layouts.navigation />
+        <!-- Navigation superior mejorada para móvil -->
+        <x-layouts.navigation class="md:pl-72" />
 
         <!-- Contenido -->
        <main class="flex-1 p-4 overflow-y-auto mt-16  md:pl-72">
@@ -93,7 +104,7 @@
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+function initLogoAnimation() {
     anime({
         targets: '.logo-line',
         strokeDashoffset: [anime.setDashoffset, 0],
@@ -102,7 +113,11 @@ document.addEventListener("DOMContentLoaded", function () {
         direction: 'alternate',
         loop: true
     });
-});
+}
+
+// Ejecutar al cargar y cada vez que Alpine actualice el DOM
+document.addEventListener('DOMContentLoaded', initLogoAnimation);
+document.addEventListener('alpine:init', initLogoAnimation);
 </script>
 
 
