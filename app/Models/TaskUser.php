@@ -16,7 +16,7 @@ class TaskUser extends Model
         'user_id',
         'status',
         'observation',
-        'submitted_at'
+        'submitted_at',
     ];
 
     // Relación con Task
@@ -43,11 +43,15 @@ class TaskUser extends Model
 
     }
     public function latestReview()
-{
-    return $this->hasOne(TaskReview::class)->latestOfMany();
-}
-public function feedbacks()
-{
-    return $this->hasMany(TaskFeedback::class);
-}
+    {
+        return $this->hasOne(TaskReview::class)->latestOfMany();
+    }
+    public function feedbacks()
+    {
+        return $this->hasMany(TaskFeedback::class);
+    }
+    public function reviewer()
+    {
+        return $this->latestReview()?->reviewer();
+    }
 }

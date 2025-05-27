@@ -22,6 +22,8 @@ class Task extends Model
         'assigned_by',
         'priority',
         'ready',
+        'submitted_at',
+        'submitted_by', // Asegúrate de que esta columna exista en tu tabla
     ];
     public const STATUS = [
     'pending',
@@ -95,7 +97,17 @@ class Task extends Model
 {
     return $this->belongsTo(User::class, 'submitted_by'); // asegúrate que tengas esa columna en tu tabla
 }
-
+public function submittedAtForUser($userId)
+{
+    return $this->taskUsers()
+                ->where('user_id', $userId)
+                ->value('submitted_at'); // o el campo que estés usando
+}
+public function getReviewerAttribute()
+{
+    // Devuelve el reviewer del primer review aprobado, o null
+    return $this->reviews->first()?->reviewer;
+}
 
 
 }
