@@ -1,6 +1,6 @@
 <div class="space-y-6">
     <!-- Tarjetas de Estado Mejoradas -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-0">
         @php
             // Estados específicos a mostrar en el orden deseado
             $filteredStatuses = [
