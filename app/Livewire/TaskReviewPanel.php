@@ -73,6 +73,13 @@ public function approveTask(int $taskId)
                 'approved_by' => Auth::id(),
                 'approved_at' => now(),
             ]);
+                TaskReview::create([
+                'task_id' => $task->id,
+                'reviewer_id' => Auth::id(),
+                'status' => TaskStatus::APPROVED->value,
+                'comments' => $this->comments ?? null,
+                'reviewed_at' => now(),
+            ]);
 
             // Opcional: Aprobar todas las asignaciones
             $task->taskUsers()->update(['status' => TaskStatus::APPROVED->value]);
@@ -124,14 +131,14 @@ public function loadMetrics()
             message: 'Reporte generado con éxito'
         );
     }
-public function loadTasksForReview()
-{
-    // Cambiar de TaskUser a Task y usar el estado de la tarea principal
-    $this->tasks = Task::where('project_id', $this->project->id)
-        ->where('status', TaskStatus::SUBMITTED->value)
-        ->with(['users', 'submittedBy', 'evidences', 'reviews.reviewer'])
-        ->get();
-}
+    public function loadTasksForReview()
+    {
+        $this->tasks = Task::with(['taskUsers.user', 'submittedBy'])
+            ->where('project_id', $this->project->id)
+            ->where('status', TaskStatus::SUBMITTED->value)
+            ->latest()
+            ->get();
+    }
 
 public function rejectTask(int $taskId)
 {
@@ -178,31 +185,31 @@ public function rejectTask(int $taskId)
         $this->comments = '';
     }
 }
-public function completeTask(int $taskUserId)
-{
-    try {
-        $taskUser = TaskUser::findOrFail($taskUserId);
+// public function completeTask(int $taskUserId)
+// {
+//     try {
+//         $taskUser = TaskUser::findOrFail($taskUserId);
         
-        if ($taskUser->status !== TaskStatus::APPROVED->value) {
-            $this->dispatch('notify', type: 'error', message: 'Solo se pueden completar tareas aprobadas');
-            return;
-        }
+//         if ($taskUser->status !== TaskStatus::APPROVED->value) {
+//             $this->dispatch('notify', type: 'error', message: 'Solo se pueden completar tareas aprobadas');
+//             return;
+//         }
 
-        $this->statusService->changeStatus(
-            $taskUser,
-            TaskStatus::APPROVED->value,
-            $this->comments
-        );
+//         $this->statusService->changeStatus(
+//             $taskUser,
+//             TaskStatus::APPROVED->value,
+//             $this->comments
+//         );
 
-        $this->dispatch('notify', type: 'success', message: 'Tarea marcada como completada');
-        $this->refreshMetrics();
-        $this->loadTasksForReview();
-    } catch (\Exception $e) {
-        $this->dispatch('notify', type: 'error', message: $e->getMessage());
-    } finally {
-        $this->comments = '';
-    }
-}
+//         $this->dispatch('notify', type: 'success', message: 'Tarea marcada como completada');
+//         $this->refreshMetrics();
+//         $this->loadTasksForReview();
+//     } catch (\Exception $e) {
+//         $this->dispatch('notify', type: 'error', message: $e->getMessage());
+//     } finally {
+//         $this->comments = '';
+//     }
+// }
 
 
     

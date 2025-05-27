@@ -86,11 +86,12 @@
             <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Tarea</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Asignados</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Enviado por</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Evidencias</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
+                        <!-- Añadir anchos mínimos a las columnas -->
+                        <th class="px-6 py-4 text-left min-w-[300px] text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Tarea</th>
+                        <th class="px-6 py-4 text-left min-w-[200px] text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Asignados</th>
+                        <th class="px-6 py-4 text-left min-w-[180px] text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Enviado por</th>
+                        <th class="px-6 py-4 text-left min-w-[250px] text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Evidencias</th>
+                        <th class="px-6 py-4 text-left min-w-[220px] text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -98,120 +99,105 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-200">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <div class="ml-4">
+                               <div class="ml-4 space-y-1.5">
                                     <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ $task->title }}</div>
-                                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ Str::limit($task->description, 40) }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ Str::limit($task->description, 40) }}</div>
                                 </div>
                             </div>
-                <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
+                        </td>
+               <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
                             <!-- Contenedor de avatares -->
                             <div class="flex -space-x-2 relative group">
                                 @foreach($task->users as $user)
-                                <div class="relative hover:-translate-y-2 transition-transform duration-200">
-                                    <img 
-                                        class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm cursor-pointer z-{{ $loop->remaining + 1 }}"
-                                        src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
-                                        alt="{{ $user->name }}"
-                                        x-data="{ showTooltip: false }"
-                                        @mouseover="showTooltip = true"
-                                        @mouseleave="showTooltip = false"
-                                    >
-                                    <!-- Tooltip flotante -->
-                                    <div 
-                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-white px-2 py-1 rounded-lg text-xs whitespace-nowrap"
-                                        x-show="showTooltip"
-                                        x-cloak
-                                    >
-                                        <div class="font-medium">{{ $user->name }}</div>
-                                        <div class="text-gray-300">{{ $user->email }}</div>
+                                   <div class="relative hover:-translate-y-1 transition-transform duration-200">
+                                        <img 
+                                            class="h-7 w-7 rounded-full border-2 border-white dark:border-gray-800 shadow-sm cursor-pointer"
+                                            src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                            alt="{{ $user->name }}"
+                                            x-tooltip="'{{ $user->name }}<br>{{ $user->email }}'"
+                                        >
                                     </div>
+                                    @endforeach
                                 </div>
-                                @endforeach
-                            </div>
                             
                             <!-- Menú desplegable "Ver todos" -->
-                            <div class="ml-3 relative" x-data="{ open: false }">
-                                <button 
-                                    @click="open = !open"
-                                    class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center"
-                                >
-                                    <span class="mr-1">Ver todos</span>
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                </button>
+                                <div class="relative" x-data="{ open: false }">
+                                    <button @click="open = !open" class="text-blue-500 hover:text-blue-700 text-sm flex items-center gap-1">
+                                        <span>Ver todos</span>
+                                        <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
                                 
                                 <!-- Lista desplegable -->
-                                <div 
-                                    x-show="open"
-                                    @click.away="open = false"
-                                    class="absolute z-10 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700"
-                                    x-cloak
-                                >
-                                    <div class="p-2 max-h-60 overflow-y-auto">
-                                        @foreach($task->users as $user)
-                                        <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                                            <img 
-                                                class="h-6 w-6 rounded-full mr-2" 
-                                                src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
-                                                alt="{{ $user->name }}"
-                                            >
-                                            <div>
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</div>
-                                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $user->email }}</div>
+                             <div x-show="open" @click.away="open = false" class="absolute z-10 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700" x-cloak>
+                                        <div class="p-2 max-h-60 overflow-y-auto space-y-2">
+                                            @foreach($task->users as $user)
+                                            <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg gap-2">
+                                                <img 
+                                                    class="h-6 w-6 rounded-full" 
+                                                    src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                                    alt="{{ $user->name }}"
+                                                >
+                                                <div class="truncate">
+                                                    <div class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $user->name }}</div>
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $user->email }}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        @endforeach
+                                            @endforeach
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
+                            <div class="flex items-center gap-3">
                                 @if($task->submittedBy)
-                                <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" 
-                                             src="{{ $user->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF' }}" 
-                                             alt="{{ $user->name }}"
-                                             title="{{ $user->name }}">
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $task->submittedBy->name }}</div>
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ $task->submitted_at->diffForHumans() }}</div>
+                                <img class="h-8 w-8 rounded-full border-2 border-white dark:border-gray-800 shadow-sm flex-shrink-0" 
+                                    src="{{ $task->submittedBy->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode($task->submittedBy->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                    alt="{{ $task->submittedBy->name }}">
+                                <div class="min-w-0"> 
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $task->submittedBy->name }}</div>
+                                    @if($submittedAt = $task->submittedAtForUser(auth()->id()))
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                        {{ \Carbon\Carbon::parse($submittedAt)->diffForHumans() }}
+                                    </div>
+                                    @endif
                                 </div>
-                                @else
-                                <span class="text-gray-400 dark:text-gray-500 italic">No enviado</span>
                                 @endif
                             </div>
                         </td>
+
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex flex-wrap gap-2">
+                            <div class="flex flex-wrap gap-2 items-center"> 
                                 @foreach ($task->evidences as $evidence)
                                 <a href="{{ asset($evidence->file_path) }}" target="_blank"
-                                   class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-800 transition-all duration-200">
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-800 transition-all duration-200 gap-1.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
-                                    {{ Str::limit($evidence->file_name, 15) }}
+                                    <span class="truncate max-w-[100px]">{{ $evidence->file_name }}</span>
                                 </a>
                                 @endforeach
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex space-x-2">
+                                <!-- Botones más compactos -->
                                 <button wire:click="approveTask({{ $task->id }})"
-                                        class="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-all duration-200 transform hover:scale-105">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="flex items-center px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg gap-1.5 transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
-                                    Aprobar
+                                    <span class="text-sm">Aprobar</span>
                                 </button>
                                 <button wire:click="rejectTask({{ $task->id }})"
-                                        class="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-200 transform hover:scale-105">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg gap-1.5 transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
-                                    Rechazar
+                                    <span class="text-sm">Rechazar</span>
                                 </button>
                             </div>
                         </td>
