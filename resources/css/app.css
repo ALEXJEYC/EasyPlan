@@ -2,6 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* Scrollbar base - Firefox */
+  * {
+    scrollbar-width: thin;
+  }
+
+  /* Modo claro (por defecto) */
+  html:not(.dark) * {
+    scrollbar-color: #4b5563 transparent; /* gris oscuro */
+  }
+
+  /* Modo oscuro */
+  html.dark * {
+    scrollbar-color: #e5e7eb transparent; /* gris claro */
+  }
+
+  /* Scrollbar para navegadores Webkit (Chrome, Edge, Safari) */
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  /* TRACK - Fondo del scroll */
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* THUMB - Modo claro (oscuro el thumb) */
+  html:not(.dark) *::-webkit-scrollbar-thumb {
+    background-color: #4b5563; /* gris oscuro */
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  /* THUMB - Modo oscuro (claro el thumb) */
+  html.dark *::-webkit-scrollbar-thumb {
+    background-color: #e5e7eb; /* gris claro */
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+}
 
 .transition-colors {
     transition-property: background-color, border-color, color;
