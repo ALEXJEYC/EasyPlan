@@ -162,7 +162,7 @@
 @endif
 @push('scripts')
 <script>
-    Livewire.on('confirmCreateRole', () => {
+    Livewire.on('confirm-rol', () => {
         Swal.fire({
             title: "¿Estás seguro?",
             text: "¿Deseas crear este Rol?",
@@ -179,18 +179,16 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Si el usuario confirma, llama al método de Livewire
-                @this.call('createRoleConfirmed'); // Llama al método createRoleConfirmed de Livewire
-            } else {
-                // Si el usuario cancela, mostrar alerta de cancelación
+                @this.createRoleConfirmed();
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
                 Swal.fire({
-                    title: 'Cancelado',
-                    text: 'La creación del rol ha sido cancelada.',
-                    icon: 'info',
-                    confirmButtonColor: '#3085d6',
+                    title: "Operación cancelada",
+                    text: "El rol no fue creado.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
                     buttonsStyling: false,
                     customClass: {
-                        confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded mx-2'
+                        confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded mx-2'
                     }
                 });
             }

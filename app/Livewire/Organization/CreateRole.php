@@ -88,7 +88,7 @@ class CreateRole extends Component
     public function createRole()
     {
         // Emitir evento para mostrar la alerta de confirmación
-        $this->dispatch('confirmCreateRole');
+        $this->dispatch('confirm-rol');
     }
     public function createRoleConfirmed()
     {
@@ -177,7 +177,7 @@ class CreateRole extends Component
         $this->loadData();
 
         $this->dispatch('notify', type: 'success', message: 'Miembro agregado exitosamente al chat y a la organización.');
-     VistaChat
+
     }
 
     // Eliminar miembros
