@@ -157,7 +157,7 @@ class CreateRole extends Component
             return;
         }
 
-        // Agregar el miembro
+        // Agregar el miembro a la organización
         $this->organization->members()->attach($this->userToAdd, [
             'custom_role_id' => $this->roleToAssign
         ]);
@@ -166,10 +166,18 @@ class CreateRole extends Component
         message: 'La organización se ha creado correctamente.'
     );
 
+        // ➕ También agregarlo al chat grupal de la organización
+        $chat = $this->organization->chats()->where('type', 'group')->first();
+
+        if ($chat) {
+            $chat->users()->syncWithoutDetaching([$this->userToAdd]);
+        }
+
         $this->showAddMemberModal = false;
         $this->loadData();
-        $this->dispatch('notify', type: 'success', message: 'Miembro agregado exitosamente.');
-        
+
+        $this->dispatch('notify', type: 'success', message: 'Miembro agregado exitosamente al chat y a la organización.');
+     VistaChat
     }
 
     // Eliminar miembros

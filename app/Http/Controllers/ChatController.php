@@ -61,11 +61,5 @@ class ChatController extends Controller
 
         return redirect()->route('chat.show', $chat);
     }
-    // public function sendTypingEvent(Request $request)
-    // {
-    //     $user = auth()->user();
-    //     $chatId = $request->chat_id; 
 
-    //     broadcast(new Typing($user, $chatId));
-    // }
 }

@@ -14,3 +14,6 @@ class TaskUserObserver
         }
     }
 }
+
+//✅ Sí se conecta indirectamente con Livewire o notificaciones.
+// Este observer es una especie de "disparador" lógico como un hook.

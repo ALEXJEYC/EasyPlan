@@ -8,6 +8,8 @@ use App\Enums\TaskStatus;
 class TaskStatusBadge extends Component
 {
     public string $status;
+    protected $listeners = ['tasksUpdated' => 'loadMetrics']; //recarga
+
     
     public function mount(string $status)
     {
