@@ -16,6 +16,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,15 @@ use App\Http\Controllers\ProjectController;
 | "web".
 |
 */
+//ruta configuraciones
+Route::middleware(['auth'])->group(function () {
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::get('/settings/account', [SettingsController::class, 'account'])->name('settings.account');
+    Route::put('/settings/account', [SettingsController::class, 'updateAccount'])->name('settings.account.update');
+
+    Route::get('/settings/account/password', [SettingsController::class, 'showPasswordForm'])->name('settings.account.password');
+    Route::put('/settings/account/password', [SettingsController::class, 'updatePassword'])->name('settings.account.password.update');
+});
 
 // Ruta raíz y login personalizado con Livewire
 Route::get('/', Login::class)->name('login')->middleware('guest');

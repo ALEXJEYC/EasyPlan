@@ -66,24 +66,36 @@ public function approveTask(int $taskId)
             throw new \InvalidArgumentException("Transición inválida de {$task->status} a approved");
         }
 
-        DB::transaction(function () use ($task) {
-            // Aprobar la tarea principal
-            $task->update([
-                'status' => TaskStatus::APPROVED->value,
-                'approved_by' => Auth::id(),
-                'approved_at' => now(),
-            ]);
-                TaskReview::create([
-                'task_id' => $task->id,
-                'reviewer_id' => Auth::id(),
-                'status' => TaskStatus::APPROVED->value,
-                'comments' => $this->comments ?? null,
-                'reviewed_at' => now(),
-            ]);
+DB::transaction(function () use ($task) {
+    // Buscar TaskUser correspondiente
+    $taskUser = $task->taskUsers()
+        ->where('user_id', Auth::id())
+        ->first();
 
-            // Opcional: Aprobar todas las asignaciones
-            $task->taskUsers()->update(['status' => TaskStatus::APPROVED->value]);
-        });
+    if (!$taskUser) {
+        throw new \Exception("No se encontró una relación TaskUser para este usuario.");
+    }
+
+    // Aprobar la tarea principal
+        $task->update([
+            'status' => TaskStatus::APPROVED->value,
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+        ]);
+
+        // Crear la revisión
+        TaskReview::create([
+            'task_id' => $task->id,
+            'task_user_id' => $taskUser->id, // ✅ Aquí se incluye
+            'reviewed_by' => Auth::id(),
+            'status' => TaskStatus::APPROVED->value,
+            'comments' => $this->comments ?? null,
+            'reviewed_at' => now(),
+        ]);
+
+        // Aprobar todos los task_users (opcional)
+        $task->taskUsers()->update(['status' => TaskStatus::APPROVED->value]);
+    });
 
         $this->dispatch('notify', 
             type: 'success', 

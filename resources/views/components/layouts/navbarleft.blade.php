@@ -23,7 +23,7 @@
             <span class="font-medium">Inicio</span>
         </a>
 
-        <a href="/projects" 
+        <!-- <a href="/projects" 
            class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-xl transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:pl-6 hover:shadow-sm group"
            x-data="{ hover: false }"
            @mouseenter="hover = true"
@@ -31,9 +31,20 @@
             <i class="fas fa-folder fa-lg w-6 text-center transform transition-all"
              x-bind:class="hover ? 'scale-125 text-black-500' : ''"></i>
             <span class="font-medium">Proyectos</span>
+        </a> -->
+        <a href="#"
+        @click.prevent
+        class="pointer-events-none opacity-50 flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-xl transition-all duration-200 group"
+        x-data="{ hover: false }"
+        @mouseenter="hover = true"
+        @mouseleave="hover = false">
+            <i class="fas fa-folder fa-lg w-6 text-center transform transition-all"
+            x-bind:class="hover ? 'scale-125 text-black-500' : ''"></i>
+            <span class="font-medium">Proyectos</span>
         </a>
 
-        <a href="/chats" 
+
+        <!-- <a href="/chats" 
            class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-xl transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:pl-6 hover:shadow-sm group"
            x-data="{ hover: false }"
            @mouseenter="hover = true"
@@ -41,7 +52,17 @@
             <i class="fas fa-comments fa-lg w-6 text-center transform transition-all"
                x-bind:class="hover ? 'scale-125 text-green-500' : ''"></i>
             <span class="font-medium">Chats</span>
-        </a>
+        </a> -->
+        <a href="#"
+            @click.prevent
+            class="pointer-events-none opacity-50 flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-xl transition-all duration-200 group"
+            x-data="{ hover: false }"
+            @mouseenter="hover = true"
+            @mouseleave="hover = false">
+                <i class="fas fa-comments fa-lg w-6 text-center transform transition-all"
+                x-bind:class="hover ? 'scale-125 text-green-500' : ''"></i>
+                <span class="font-medium">Chats</span>
+            </a>
 
         <a href="/settings" 
            class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-xl transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:pl-6 hover:shadow-sm group"

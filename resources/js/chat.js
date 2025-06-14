@@ -3,11 +3,15 @@ const msgerInput = get(".msger-input");
 const msgerChat = get(".msger-chat");
 const PERSON_IMG = "https://w7.pngwing.com/pngs/981/645/png-transparent-default-profile-united-states-computer-icons-desktop-free-high-quality-person-icon-miscellaneous-silhouette-symbol-thumbnail.png";
 const chatWith = get(".chatWith");
-const typing = get(".typing");
 const chatStatus = get(".chatStatus");
 const chatId = get("#hiddenInput").value;
 let authUser;
 let typingTimer = false;
+let lastTypingTime = 0;
+
+// Indicador de typing
+let typingIndicator = null;
+let isTypingIndicatorVisible = false;
 
 window.onload = function () {
     axios.get('/auth/user')
@@ -15,13 +19,16 @@ window.onload = function () {
             authUser = r.data.authUser;
         })
         .then(() => {
-            axios.get(`/chats/${chatId}/get-user`)
-                .then(r => {
-                    let result = r.data.users.filter(user => user.id != authUser.id)
-                    if (result.length > 0) {
-                        chatWith.innerHTML = result[0].name;
-                    }
-                })
+        axios.get(`/chats/${chatId}/get-user`)
+            .then(r => {
+            const otherUsers = r.data.users.filter(user => user.id != authUser.id);
+            
+            // Solo actualiza si es chat 1:1 (exactamente 1 otro usuario)
+            if (otherUsers.length === 1) {
+                chatWith.innerHTML = otherUsers[0].name;
+            }
+            // Para grupos (organización/proyecto): NO hagas nada (mantén título inicial)
+            })
         })
         .then(() => {
             axios.get(`/chats/${chatId}/get-messages`)
@@ -32,6 +39,8 @@ window.onload = function () {
         .then(() => {
             Echo.join(`chats.${chatId}`)
                 .listen('MessageSent', (e) => {
+                    // Ocultar el indicador de typing cuando llega un mensaje nuevo
+                    hideTypingIndicator();
                     appendMessage(
                         e.message.user.name,
                         PERSON_IMG,
@@ -42,7 +51,6 @@ window.onload = function () {
                 })
                 .here(users => {
                     let result = users.filter(user => user.id != authUser.id)
-
                     if (result)
                         chatStatus.classList = 'chatStatus online';
                 })
@@ -55,17 +63,14 @@ window.onload = function () {
                         chatStatus.classList = 'chatStatus offline';
                 })
                 .listenForWhisper('typing', e => {
-                    if (e > 0)
-                        typing.style.display = '';
-
-                    if (typingTimer) {
-                        clearTimeout(typingTimer)
+                    // Solo mostrar si ha habido actividad reciente (últimos 3 segundos)
+                    if (Date.now() - lastTypingTime < 3000) {
+                        if (e > 0) {
+                            showTypingIndicator();
+                        } else {
+                            hideTypingIndicator();
+                        }
                     }
-
-                    typingTimer = setTimeout(() => {
-                        typing.style.display = 'none';
-                        typingTimer = false;
-                    }, 3000);
                 })
         })
 }
@@ -75,6 +80,11 @@ msgerForm.addEventListener("submit", event => {
 
     const msgText = msgerInput.value;
     if (!msgText) return;
+
+    // Ocultar el indicador de typing antes de enviar
+    hideTypingIndicator();
+    // Enviar evento de que dejó de escribir
+    sendTypingEvent(false);
 
     axios.post('/message/sent', {
         message: msgText,
@@ -100,24 +110,34 @@ function get(selector, root = document) {
 }
 
 function appendMessage(name, img, side, text, date) {
-    //   Simple solution for small apps
-    const msgHTML = `
-                <div class="msg ${side}-msg">
-                <div class="msg-img" style="background-image: url(${img})"></div>
+    // Si hay un indicador de typing visible, lo removemos temporalmente
+    if (isTypingIndicatorVisible && typingIndicator) {
+        typingIndicator.remove();
+        isTypingIndicatorVisible = false;
+    }
 
-                <div class="msg-bubble">
-                    <div class="msg-info">
+    const msgHTML = `
+        <div class="msg ${side}-msg">
+            <div class="msg-img" style="background-image: url(${img})"></div>
+            <div class="msg-bubble">
+                <div class="msg-info">
                     <div class="msg-info-name">${name}</div>
                     <div class="msg-info-time">${date}</div>
-                    </div>
-
-                    <div class="msg-text">${text}</div>
                 </div>
-                </div>
-            `;
+                <div class="msg-text">${text}</div>
+            </div>
+        </div>
+    `;
 
     msgerChat.insertAdjacentHTML("beforeend", msgHTML);
-    scrollToBotton();
+    
+    // Si habíamos removido el indicador, lo volvemos a mostrar
+    if (typingIndicator) {
+        msgerChat.appendChild(typingIndicator);
+        isTypingIndicatorVisible = true;
+    }
+    
+    scrollToBottom();
 }
 
 function appendMessages(messages) {
@@ -125,7 +145,6 @@ function appendMessages(messages) {
 
     messages.forEach(message => {
         side = (message.user_id == authUser.id) ? 'right' : 'left';
-
         appendMessage(
             message.user.name,
             PERSON_IMG,
@@ -146,16 +165,68 @@ function formatDate(date) {
     return `${d}/${mo}/${y} ${h.slice(-2)}:${m.slice(-2)}`;
 }
 
-function scrollToBotton() {
+function scrollToBottom() {
     msgerChat.scrollTop = msgerChat.scrollHeight;
 }
 
-function sendTypingEvent() {
+function sendTypingEvent(isTyping = true) {
+    lastTypingTime = Date.now();
     typingTimer = true;
     Echo.join(`chats.${chatId}`)
-        .whisper('typing', msgerInput.value.length);
+        .whisper('typing', isTyping ? 1 : 0);
 }
 
+function showTypingIndicator() {
+    if (isTypingIndicatorVisible) return;
+    
+    // Crear el elemento de typing si no existe
+    if (!typingIndicator) {
+        const typingHTML = `
+            <div class="msg left-msg" id="typing-indicator">
+                <div class="msg-img" style="background-image: url(${PERSON_IMG})"></div>
+                <div class="msg-bubble">
+                    <div class="typing-message">
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        msgerChat.insertAdjacentHTML("beforeend", typingHTML);
+        typingIndicator = document.getElementById('typing-indicator');
+    } else {
+        typingIndicator.style.display = 'flex';
+    }
+    
+    isTypingIndicatorVisible = true;
+    scrollToBottom();
+}
+
+function hideTypingIndicator() {
+    if (typingIndicator && isTypingIndicatorVisible) {
+        typingIndicator.style.display = 'none';
+        isTypingIndicatorVisible = false;
+    }
+}
+
+// Manejo de eventos de typing mejorado
 msgerInput.addEventListener('input', () => {
-    sendTypingEvent();
-})
+    sendTypingEvent(true);
+});
+
+msgerInput.addEventListener('blur', () => {
+    sendTypingEvent(false);
+    hideTypingIndicator();
+});
+
+// Verificar periódicamente si el usuario dejó de escribir
+setInterval(() => {
+    if (typingTimer && Date.now() - lastTypingTime > 3000) {
+        sendTypingEvent(false);
+        hideTypingIndicator();
+        typingTimer = false;
+    }
+}, 1000);

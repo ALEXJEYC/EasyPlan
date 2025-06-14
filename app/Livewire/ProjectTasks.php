@@ -122,16 +122,21 @@ class ProjectTasks extends Component
             ]);
         }
 
-        // Limpiar el formulario y emitir eventos
-        $this->reset(['title', 'description', 'deadline', 'assignedTo']);
-        $this->dispatch('tasksUpdated'); // Forzar actualización
 
-        $this->dispatch('taskCreated', projectId: $this->project->id);
-        $this->dispatch('notify', 
-            type: 'success', 
-            message: 'Tarea creada con ' . count($this->assignedTo) . ' asignados'
-        );
-    }
+    $asignados = count($this->assignedTo);
+
+
+    $this->reset(['title', 'description', 'deadline', 'assignedTo']);
+    
+    $this->dispatch('tasksUpdated');
+    $this->dispatch('taskCreated', projectId: $this->project->id);
+
+   
+    $this->dispatch('notify', 
+        type: 'success', 
+        message: 'Tarea creada con ' . $asignados . ' asignados'
+    );
+}
     // Agrega este método a tu componente Livewire
 public function submitTask()
 {
