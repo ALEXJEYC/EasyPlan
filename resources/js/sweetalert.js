@@ -12,3 +12,15 @@ window.showSuccessAlert = (title, text) => {
     confirmButtonColor: '#3085d6'
   });
 };
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        Livewire.on('projectCreated', projectId => {
+            Swal.fire({
+                title: '¡Éxito!',
+                text: 'El proyecto ha sido creado exitosamente.',
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            });
+        });
+    });

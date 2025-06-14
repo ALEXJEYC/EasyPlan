@@ -32,11 +32,26 @@ document.addEventListener('livewire:init', () => {
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Sí, crear organización",
-            cancelButtonText: "Cancelar"
+            cancelButtonText: "Cancelar",
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded mx-2',
+                cancelButton: 'bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded mx-2'
+            }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Llamamos directamente al método del componente
                 @this.doCreateOrganization();
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                Swal.fire({
+                    title: "Operación cancelada",
+                    text: "La organización no fue creada.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    buttonsStyling: false,
+                    customClass: {
+                        confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded mx-2'
+                    }
+                });
             }
         });
     });
@@ -47,7 +62,11 @@ document.addEventListener('livewire:init', () => {
             title: data.title,
             text: data.message,
             icon: "success",
-            confirmButtonColor: "#3085d6"
+            confirmButtonColor: "#3085d6",
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded mx-2'
+            }
         });
     });
     
@@ -57,7 +76,11 @@ document.addEventListener('livewire:init', () => {
             title: "Error",
             text: data.message,
             icon: "error",
-            confirmButtonColor: "#d33"
+            confirmButtonColor: "#d33",
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded mx-2'
+            }
         });
     });
 });

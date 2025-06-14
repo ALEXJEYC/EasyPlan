@@ -39,6 +39,14 @@ class CreateRole extends Component
     public $showRemoveConfirmation = false;
     public $memberToRemove = null;
 
+    public function showConfirm()
+    {
+        $this->validate();
+        
+         // Disparamos el evento de confirmación
+        $this->dispatch('show-confirm-dialog');
+    }
+
     public function mount(Organization $organization, 
     // array $permissions
     )
@@ -79,6 +87,11 @@ class CreateRole extends Component
     // Creación de roles
     public function createRole()
     {
+        // Emitir evento para mostrar la alerta de confirmación
+        $this->dispatch('confirmCreateRole');
+    }
+    public function createRoleConfirmed()
+    {
         $this->validate([
             'newRoleName' => 'required|string|max:255|unique:custom_roles,name,NULL,id,organization_id,'.$this->organization->id,
             'selectedPermissions' => 'nullable|array',
@@ -96,6 +109,12 @@ class CreateRole extends Component
 
         $this->reset(['newRoleName', 'selectedPermissions']);
         $this->loadData(); // Recargar datos
+        
+         // Disparar evento de éxito
+         $this->dispatch('show-success-message', 
+         title: '¡Rol creado!',
+         message: 'El rol se ha creado correctamente.'
+     );
         
         $this->dispatch('notify', type: 'success', message: 'Rol creado exitosamente.');
     }
@@ -142,10 +161,15 @@ class CreateRole extends Component
         $this->organization->members()->attach($this->userToAdd, [
             'custom_role_id' => $this->roleToAssign
         ]);
+        $this->dispatch('show-success-message', 
+        title: '¡Organización creada!',
+        message: 'La organización se ha creado correctamente.'
+    );
 
         $this->showAddMemberModal = false;
         $this->loadData();
         $this->dispatch('notify', type: 'success', message: 'Miembro agregado exitosamente.');
+        
     }
 
     // Eliminar miembros
