@@ -108,3 +108,22 @@
         </div>
     @endif
 </div>
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Livewire.on('projectCreated', projectId => {
+            Swal.fire({
+            title: "Proyecto creado!",
+            icon: "success",
+            confirmButtonColor: "#3085d6", // Cambia este valor al color deseado
+            draggable: true,
+            confirmButtonText: 'Aceptar',
+            customClass: {
+                confirmButton: 'bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded mx-2'}
+
+        });
+        
+        });
+    });
+</script>
+@endpush

@@ -160,7 +160,57 @@
         </div>
     </div>
 @endif
-
+@push('scripts')
+<script>
+    Livewire.on('confirmCreateRole', () => {
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "¿Deseas crear este Rol?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, crear Rol",
+            cancelButtonText: "Cancelar",
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded mx-2',
+                cancelButton: 'bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded mx-2'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Si el usuario confirma, llama al método de Livewire
+                @this.call('createRoleConfirmed'); // Llama al método createRoleConfirmed de Livewire
+            } else {
+                // Si el usuario cancela, mostrar alerta de cancelación
+                Swal.fire({
+                    title: 'Cancelado',
+                    text: 'La creación del rol ha sido cancelada.',
+                    icon: 'info',
+                    confirmButtonColor: '#3085d6',
+                    buttonsStyling: false,
+                    customClass: {
+                        confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded mx-2'
+                    }
+                });
+            }
+        });
+    });
+    // Mensaje de éxito
+    Livewire.on('show-success-message', (data) => {
+        Swal.fire({
+            title: data.title,
+            text: data.message,
+            icon: "success",
+            confirmButtonColor: "#3085d6",
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded mx-2'
+            }
+        });
+    });
+</script>
+@endpush
 <!-- Modal de confirmación de eliminación -->
 @if($showRemoveConfirmation)
     <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">

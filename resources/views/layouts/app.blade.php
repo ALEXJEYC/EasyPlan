@@ -27,8 +27,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EasyPlan</title>
 
-@vite('resources/css/app.css')
-@livewireStyles
+
+    @vite(['resources/js/app.js', 'resources/css/app.css'])
+    @livewireStyles
+
+
 
 <!-- Font Awesome y Alpine -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -99,6 +102,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -120,6 +124,6 @@ document.addEventListener('DOMContentLoaded', initLogoAnimation);
 document.addEventListener('alpine:init', initLogoAnimation);
 </script>
 
-
+@stack('scripts')
 </body>
 </html>

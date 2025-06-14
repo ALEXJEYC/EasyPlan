@@ -17,6 +17,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
-        "animejs": "^4.0.2"
+        "animejs": "^4.0.2",
+        "sweetalert2": "^11.21.2"
     }
 }

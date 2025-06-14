@@ -88,6 +88,8 @@ class ButtonProject extends Component
             'organization_id' => $this->organization->id,
             'created_by' => auth()->id(),
         ])->users()->sync($members);
+        
+        $this->dispatch('projectCreated', ['projectId' => $project->id]);
 
         $this->dispatch('projectCreated', projectId: $project->id);
         $this->closeModal();
