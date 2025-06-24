@@ -25,11 +25,10 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- TODO: AGREGAR ICONO A LA PAGINA PRINCIPAL -->
 <title>EasyPlan</title>
-
-
-    @vite(['resources/js/app.js', 'resources/css/app.css'])
-    @livewireStyles
+@vite('resources/css/app.css')
+@livewireStyles
 
 
 
@@ -124,6 +123,5 @@ document.addEventListener('DOMContentLoaded', initLogoAnimation);
 document.addEventListener('alpine:init', initLogoAnimation);
 </script>
 
-@stack('scripts')
 </body>
 </html>

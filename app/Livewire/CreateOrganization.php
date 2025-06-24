@@ -6,7 +6,9 @@ use Livewire\Component;
 use App\Models\Organization;
 use App\Models\CustomRole;
 use App\Models\Permission;
+use Illuminate\Support\Facades\Auth;
 
+// <!-- TODO: cambiar formulario de FORMULARIO  AGREGAR CAMPOS DE SUBIR IMAGEN DE ORGANIZAICON  -->
 class CreateOrganization extends Component
 {
     public $name;

@@ -45,18 +45,4 @@ class Chat extends Model
             $q->where('users.id', $userId);
         });
     }
-    // public function isGroup()
-    // {
-    //     return $this->type === 'group';
-    // }
-
-//     public function users(): BelongsToMany
-//     {
-//         return $this->belongsToMany(User::class);
-//     }
-
-//     public function messages(): HasMany
-//     {
-//         return $this->hasMany(Message::class);
-//     }
 }

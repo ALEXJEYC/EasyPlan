@@ -10,6 +10,7 @@
             EasyPlan
         </h2>
     </div>
+    <!-- TODO:habilitar boton de proyectos y chat con sus respectivas rutas -->
 
     <!-- Menú de navegación -->
     <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto">
