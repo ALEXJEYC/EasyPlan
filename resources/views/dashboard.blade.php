@@ -12,9 +12,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Crear organización -->
             <x-card class="md:col-span-2">
-                <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Crear Nueva Organización</h2>
                 <livewire:create-organization />
-                <x-flash-message />
             </x-card>
 
             <!-- Lista de organizaciones -->

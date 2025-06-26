@@ -276,7 +276,6 @@ class CreateRole extends Component
 
         $membership->delete();
 
-        $this->showRemoveConfirmation = false;
         $this->loadData();
         $this->dispatch('notify', type: 'success', message: 'Miembro eliminado exitosamente.');
     }

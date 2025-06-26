@@ -22,21 +22,27 @@ class OrganizationList extends Component
     {
         $this->loadOrganizations();
     }
-    private function loadOrganizations()
-    {
-        $user = auth()->user();
+private function loadOrganizations()
+{
+    $user = auth()->user();
 
-        $ownerOrganizations = Organization::whereHas('ownerRelation', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })->get();
+    $ownerOrganizations = Organization::whereHas('ownerRelation', function ($query) use ($user) {
+        $query->where('user_id', $user->id);
+    })->orderBy('created_at', 'desc')->get();
 
-        $memberOrganizations = $user->memberships()->with('organization')->get()->map(function ($membership) {
+    $memberOrganizations = $user->memberships()
+        ->with('organization')
+        ->get()
+        ->map(function ($membership) {
             return $membership->organization;
         });
 
-
-        $this->organizations = $ownerOrganizations->merge($memberOrganizations);
-    }
+    // Ordena el merge por fecha de creación descendente
+    $this->organizations = $ownerOrganizations
+        ->merge($memberOrganizations)
+        ->sortByDesc('created_at')
+        ->values();
+}
 
 
     public function render()
