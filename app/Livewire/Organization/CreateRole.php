@@ -14,70 +14,130 @@ use App\Helpers\PermissionsHelper;
 class CreateRole extends Component
 {
     public Organization $organization;
-    // public array $permissions = [
-    //     'canAddMembers' => false,
-    //     'canRemoveMembers' => false,
-    // ];
-    
+
     // Propiedades para manejo de roles
     public $newRoleName = '';
     public $allPermissions = [];
     public $selectedPermissions = [];
-    
+
     // Propiedades para manejo de miembros
     public $users = [];
     public $memberships = [];
     public $roles = [];
     public $ownerId;
-    
+
     // Formulario para agregar miembros
     public $userToAdd = null;
     public $roleToAssign = null;
-    
+
     // Estado para UI
     public $showAddMemberModal = false;
-    public $showRemoveConfirmation = false;
     public $memberToRemove = null;
+    //trasnferir organización
+    public $showTransferModal = false;
+    public $transferToUserId = null;
+    //cambiar rol de miembro
+    public $pendingRoleChange = null;
+    //nombres de las propiedades para permisos
+    public $permissionsnames = [
+        'add_members' => 'Agregar miembros',
+        'remove_members' => 'Eliminar miembros',
+        'manage_roles' => 'Gestionar roles',
+        'create_project' => 'Crear proyecto',
+        'Review_tasks' => 'Revisar tareas',
+        'create_tasks' => 'Crear tareas',
+        'create_roles' => 'Crear roles',
+    ];
+
+    public function openTransferModal()
+    {
+        $this->showTransferModal = true;
+        $this->transferToUserId = null;
+    }
+    //funcion para transferir organización
+
+
+    public function transferOrganization()
+    {
+        $this->validate([
+            'transferToUserId' => 'required|exists:users,id|different:' . $this->organization->ownerRelation->user_id,
+        ]);
+
+        // Disparar SweetAlert de confirmación
+        $this->dispatch('confirm-transfer');
+    }
+
+    // Este método se llama si el usuario confirma la transferencia
+    public function confirmTransferOrganization($remove = false)
+    {
+        $oldOwnerId = $this->organization->ownerRelation->user_id;
+        $newOwnerId = $this->transferToUserId;
+
+        // Cambiar owner
+        $this->organization->ownerRelation->update(['user_id' => $newOwnerId]);
+
+        // Si el owner decide retirarse, lo eliminamos de la organización
+        if ($remove) {
+            $this->organization->members()->detach($oldOwnerId);
+        } else {
+            // Si decide quedarse, lo dejamos como miembro sin rol
+            $this->organization->members()->updateExistingPivot($oldOwnerId, ['custom_role_id' => null]);
+        }
+
+        $this->showTransferModal = false;
+        $this->loadData();
+
+        $this->dispatch('notify', type: 'success', message: 'Organización transferida exitosamente.');
+    }
+
 
     public function showConfirm()
     {
         $this->validate();
-        
-         // Disparamos el evento de confirmación
+
+        // Disparamos el evento de confirmación
         $this->dispatch('show-confirm-dialog');
     }
 
-    public function mount(Organization $organization, 
-    // array $permissions
-    )
-    {
+    public function mount(
+        Organization $organization,
+        // array $permissions
+    ) {
         $this->organization = $organization;
         // $this->permissions = $permissions;
         $this->ownerId = $organization->ownerRelation->user_id;
-        
+
         $this->loadData();
     }
 
     protected function loadData()
     {
-        $this->users = User::whereNotIn('id', 
+        $this->users = User::whereNotIn(
+            'id',
             $this->organization->members->pluck('id')->push($this->ownerId)
         )->get();
-        
+
         $this->memberships = $this->organization->memberships()
             ->with(['user', 'customRole'])
             ->get();
-            
+
         $this->roles = $this->organization->customRoles()
             ->where('name', '!=', 'owner')  // ← Excluir rol owner
             ->get();
-        $this->allPermissions = Permission::all();
+        $this->allPermissions = Permission::where('name', '!=', 'can_transfer_organization')->get();
     }
-    public function getCanAddMembersProperty(): bool {
+    //funcion para agregar roles
+    public function getCanCreateRolesProperty(): bool
+    {
+        return PermissionsHelper::getFor(auth()->user(), $this->organization)['canCreateRoles'];
+    }
+    public function getCanAddMembersProperty(): bool
+    {
         return PermissionsHelper::getFor(auth()->user(), $this->organization)['canAddMembers'];
     }
 
-    public function getCanRemoveMembersProperty(): bool {
+    public function getCanRemoveMembersProperty(): bool
+    {
         return PermissionsHelper::getFor(auth()->user(), $this->organization)['canRemoveMembers'];
     }
     public function getCanManageRolesProperty(): bool
@@ -93,7 +153,7 @@ class CreateRole extends Component
     public function createRoleConfirmed()
     {
         $this->validate([
-            'newRoleName' => 'required|string|max:255|unique:custom_roles,name,NULL,id,organization_id,'.$this->organization->id,
+            'newRoleName' => 'required|string|max:255|unique:custom_roles,name,NULL,id,organization_id,' . $this->organization->id,
             'selectedPermissions' => 'nullable|array',
             'selectedPermissions.*' => 'exists:permissions,id'
         ]);
@@ -109,26 +169,43 @@ class CreateRole extends Component
 
         $this->reset(['newRoleName', 'selectedPermissions']);
         $this->loadData(); // Recargar datos
-        
-         // Disparar evento de éxito
-         $this->dispatch('show-success-message', 
-         title: '¡Rol creado!',
-         message: 'El rol se ha creado correctamente.'
-     );
-        
+
+        // Disparar evento de éxito
+        $this->dispatch(
+            'show-success-message',
+            title: '¡Rol creado!',
+            message: 'El rol se ha creado correctamente.'
+        );
+
         $this->dispatch('notify', type: 'success', message: 'Rol creado exitosamente.');
+    }
+    public function confirmChangeRole($membershipId, $roleId)
+    {
+        $this->pendingRoleChange = ['membershipId' => $membershipId, 'roleId' => $roleId];
+        $this->dispatch('show-role-change-confirmation');
+    }
+
+    public function applyRoleChange()
+    {
+        if ($this->pendingRoleChange) {
+            $this->assignRoleToUser(
+                $this->pendingRoleChange['membershipId'],
+                $this->pendingRoleChange['roleId']
+            );
+            $this->pendingRoleChange = null;
+        }
     }
 
     // Asignación de roles a usuarios
     public function assignRoleToUser($membershipId, $roleId)
     {
-            if (!$this->canManageRoles) {
-        abort(403, 'No tienes permiso para gestionar roles');
-    }
+        if (!$this->canManageRoles) {
+            abort(403, 'No tienes permiso para gestionar roles');
+        }
 
-    validator(['roleId' => $roleId], [
-        'roleId' => 'required|exists:custom_roles,id',
-    ])->validate();
+        validator(['roleId' => $roleId], [
+            'roleId' => 'required|exists:custom_roles,id',
+        ])->validate();
 
         Membership::where('id', $membershipId)
             ->update(['custom_role_id' => $roleId]);
@@ -161,12 +238,13 @@ class CreateRole extends Component
         $this->organization->members()->attach($this->userToAdd, [
             'custom_role_id' => $this->roleToAssign
         ]);
-        $this->dispatch('show-success-message', 
-        title: '¡Organización creada!',
-        message: 'La organización se ha creado correctamente.'
-    );
+        $this->dispatch(
+            'show-success-message',
+            title: 'Usuario agregado',
+            message: 'El usuario ha sido agregado a la organización correctamente.'
+        );
 
-        // ➕ También agregarlo al chat grupal de la organización
+        //  También agregarlo al chat grupal de la organización
         $chat = $this->organization->chats()->where('type', 'group')->first();
 
         if ($chat) {
@@ -177,20 +255,19 @@ class CreateRole extends Component
         $this->loadData();
 
         $this->dispatch('notify', type: 'success', message: 'Miembro agregado exitosamente al chat y a la organización.');
-
     }
 
     // Eliminar miembros
     public function confirmRemoveMember($membershipId)
     {
         $this->memberToRemove = $membershipId;
-        $this->showRemoveConfirmation = true;
+        $this->dispatch('show-remove-confirmation');
     }
 
     public function removeMember()
     {
         $membership = Membership::findOrFail($this->memberToRemove);
-        
+
         // Verificar que no sea el owner
         if ($membership->user_id == $this->ownerId) {
             $this->dispatch('notify', type: 'error', message: 'No puedes eliminar al dueño de la organización.');
@@ -198,7 +275,7 @@ class CreateRole extends Component
         }
 
         $membership->delete();
-        
+
         $this->showRemoveConfirmation = false;
         $this->loadData();
         $this->dispatch('notify', type: 'success', message: 'Miembro eliminado exitosamente.');

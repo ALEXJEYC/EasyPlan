@@ -11,6 +11,7 @@ use App\Enums\TaskStatus;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\PermissionsHelper;
 
 class ProjectTasks extends Component
 {
@@ -44,6 +45,11 @@ class ProjectTasks extends Component
     public function mount(Project $project)
     {
         $this->project = $project;
+    }
+    //agregamos funcion de permiso para crear tareas
+    public function getCanCreateTasksProperty(): bool
+    {
+        return PermissionsHelper::getFor(auth()->user(), $this->project->organization)['canCreateTasks'];
     }
 
     public function rules()

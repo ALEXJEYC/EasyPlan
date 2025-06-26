@@ -53,6 +53,24 @@ class OrganizationPolicy
         return $org->isOwner($user) || 
             $user->hasPermissionInOrganization('Review_tasks', $org->id);
     }
+    // permiso parar crear tareas
+    public function manageCreateTasks(User $user, Organization $org): bool
+    {
+        return $org->isOwner($user) || 
+            $user->hasPermissionInOrganization('create_tasks', $org->id);
+    }
+    //permiso para crear roles
+    public function manageCreateRoles(User $user, Organization $org): bool
+    {
+        return $org->isOwner($user) || 
+            $user->hasPermissionInOrganization('create_roles', $org->id);
+    }
+    // funcion para transferir organizacion
+    public function manageTransferOrganization(User $user, Organization $org): bool
+    {
+        return $org->isOwner($user) || 
+            $user->hasPermissionInOrganization('can_transfer_organization', $org->id);
+    }
 
 
 

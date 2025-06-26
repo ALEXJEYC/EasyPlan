@@ -11,6 +11,7 @@
                     Inicio
                 </button>
             </li>
+
             <li class="mr-2">
                 <button @click="tab = 'tareas'" :class="{ 'border-blue-600 text-blue-600': tab === 'tareas' }"
                         class="inline-block p-4 border-b-2 border-transparent hover:border-blue-600 hover:text-blue-600">
