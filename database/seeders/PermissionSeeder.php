@@ -19,6 +19,7 @@ class PermissionSeeder extends Seeder
             // 'recibir_tareas',
             // 'puede_tener_tareas',
             // 'transferir_organizacion',
+            'Review_tasks',
             'manage_roles',
             'create_project',
             'add_members',

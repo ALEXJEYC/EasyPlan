@@ -48,6 +48,11 @@ class OrganizationPolicy
         return $org->isOwner($user) || 
             $user->hasPermissionInOrganization('create_project', $org->id);
     }
+    public function manageReviewTasks(User $user, Organization $org): bool
+    {
+        return $org->isOwner($user) || 
+            $user->hasPermissionInOrganization('Review_tasks', $org->id);
+    }
 
 
 

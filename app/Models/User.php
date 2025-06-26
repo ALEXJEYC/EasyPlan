@@ -104,6 +104,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(TaskFeedback::class, 'from_user_id');
     }
+    public function taskUsers()
+{
+    return $this->hasMany(TaskUser::class);
+}
+
 
     public function hasPermissionInOrganization(string $permission, int $organizationId): bool
     {

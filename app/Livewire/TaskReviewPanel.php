@@ -51,6 +51,11 @@ class TaskReviewPanel extends Component
         $this->loadTasksForReview();
         
     }
+    public function canreviewTasks(): bool
+    {
+        // Verifica si el usuario tiene permiso para revisar tareas en el proyecto actual
+        return Auth::user()->hasPermissionInOrganization('Review_tasks', $this->project->organization_id);
+    }
     
     // public function __construct()
     // {
@@ -72,9 +77,13 @@ DB::transaction(function () use ($task) {
         ->where('user_id', Auth::id())
         ->first();
 
-    if (!$taskUser) {
-        throw new \Exception("No se encontró una relación TaskUser para este usuario.");
-    }
+if (!$taskUser) {
+    // Crear la relación si no existe
+    $taskUser = $task->taskUsers()->create([
+        'user_id' => Auth::id(),
+        'status' => TaskStatus::APPROVED->value,
+    ]);
+}
 
     // Aprobar la tarea principal
         $task->update([

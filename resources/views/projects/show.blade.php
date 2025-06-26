@@ -17,12 +17,14 @@
                     Tareas
                 </button>
             </li>
+                @if($canreviewTasks)
             <li class="mr-2">
                 <button @click="tab = 'revision'" :class="{ 'border-blue-600 text-blue-600': tab === 'revision' }"
                         class="inline-block p-4 border-b-2 border-transparent hover:border-blue-600 hover:text-blue-600">
                     Revisión
                 </button>
             </li>
+                @endif
             <li class="mr-2">
                 <button @click="tab = 'historial'" :class="{ 'border-blue-600 text-blue-600': tab === 'historial' }"
                         class="inline-block p-4 border-b-2 border-transparent hover:border-blue-600 hover:text-blue-600">
@@ -40,10 +42,12 @@
     <div x-show="tab === 'tareas'" class="mb-8">
         @livewire('project-tasks', ['project' => $project]) <!-- Simplificado -->
     </div>
+
     <div x-show="tab === 'revision'" class="mb-8">
         @livewire('task-review-panel', ['project' => $project])
 
     </div>
+
 
     <div x-show="tab === 'historial'" class="mb-8">
         @livewire('task-history', ['project' => $project])
