@@ -1,13 +1,16 @@
 <div>
     <!-- Botón para abrir el modal -->
     <div class="group relative">
-        <button wire:click="openModal"
-            class="w-full h-full bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 min-h-[300px] flex flex-col items-center justify-center">
-            <div class="text-center transform transition-transform group-hover:scale-110">
-                <span class="text-4xl font-bold text-blue-600 dark:text-blue-400">+</span>
-                <p class="mt-2 text-lg font-medium text-gray-700 dark:text-gray-300">Nueva Organización</p>
-            </div>
-        </button>
+
+        <div class="flex justify-center mb-4">
+            <button wire:click="openModal"
+                class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 min-h-[100px] flex flex-col items-center justify-center">
+                <div class="text-center transform transition-transform group-hover:scale-110">
+                    <span class="text-4xl font-bold text-blue-600 dark:text-blue-400">+</span>
+                    <p class="mt-2 text-lg font-medium text-gray-700 dark:text-gray-300">Nueva Organización</p>
+                </div>
+            </button>
+        </div>
     </div>
 
     <!-- Modal -->
@@ -168,6 +171,5 @@
                 });
             });
         });
-
     </script>
 @endpush

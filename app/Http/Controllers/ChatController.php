@@ -61,5 +61,14 @@ class ChatController extends Controller
 
         return redirect()->route('chat.show', $chat);
     }
+    public function userChats()
+{
+    $user = auth()->user();
+    $chats = $user->chats()->with(['users', 'messages' => function($query) {
+        $query->latest()->limit(1);
+    }])->get();
+    
+    return view('chats.index', compact('chats'));
+}
 
 }

@@ -91,20 +91,11 @@
                                 <div class="flex-1 min-w-0">
                                     <div class="flex justify-between items-start">
                                         <h4 class="font-bold text-gray-800 dark:text-white truncate">{{ $chat->name }}</h4>
-                                        <!-- Indicador de actividad (opcional) -->
-                                        <!-- <span class="bg-green-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                                            3
-                                        </span> -->
                                     </div>
                                     <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm truncate">
                                         {{ $chat->description ?? 'Sin descripción disponible' }}
                                     </p>
                                     <div class="mt-3 flex justify-between items-center">
-                                        <!-- Participantes (opcional) -->
-                                        <!-- <div class="flex -space-x-2">
-                                            <img class="w-6 h-6 rounded-full border-2 border-white dark:border-gray-800" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Participante">
-                                            <img class="w-6 h-6 rounded-full border-2 border-white dark:border-gray-800" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Participante">
-                                        </div> -->
                                         <a href="{{ route('chat.show', $chat) }}" class="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                                             Abrir chat
                                             <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

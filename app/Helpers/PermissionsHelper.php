@@ -19,6 +19,7 @@ class PermissionsHelper
             'canCreateRoles' => $user->hasPermissionInOrganization('create_roles', $organization->id),
             //no se incluye el permiso para transferir la organización
             // 'canTransferOrganization' => $user->hasPermissionInOrganization('can_transfer_organization', $organization->id),
+            'canManageProjects' => $user->hasPermissionInOrganization('Manage_projects', $organization->id),
         ];
     }
     public static function userHasPermission(User $user, Organization $org, string $permission): bool {

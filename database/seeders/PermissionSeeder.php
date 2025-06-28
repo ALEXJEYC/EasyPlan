@@ -14,10 +14,9 @@ class PermissionSeeder extends Seeder
         $permisos = [
             // 'eliminar_organizacion',
             // 'asignar_tareas',
-            // 'agregar_usuarios',
             // 'editar_tareas',
-            // 'recibir_tareas',
             // 'puede_tener_tareas',
+            'Manage_projects',
             'can_transfer_organization',
             'create_roles',
             'create_tasks',

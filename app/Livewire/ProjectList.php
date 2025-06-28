@@ -7,8 +7,9 @@ use Livewire\Component;
 
 class ProjectList extends Component
 {
-    public $organization;
     public $projects;
+    public $organization;
+    public bool $showArchived = false;
 
     protected $listeners = ['projectCreated' => 'loadProjects'];
 
@@ -20,10 +21,9 @@ class ProjectList extends Component
 
     public function loadProjects()
     {
-        $this->projects = $this->organization
-            ->projects()
-            ->forUser(auth()->id())
-            ->latest()
+        $this->projects = $this->organization->projects()
+            ->with(['organization', 'users'])
+            ->active()
             ->get();
     }
 

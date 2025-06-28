@@ -37,7 +37,7 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        //
+         return $project->users()->where('users.id', $user->id)->exists() || $user->hasPermissionInOrganization('Manage_projects', $project->organization_id);
     }
 
     /**

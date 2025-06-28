@@ -47,6 +47,8 @@ class CreateRole extends Component
         'Review_tasks' => 'Revisar tareas',
         'create_tasks' => 'Crear tareas',
         'create_roles' => 'Crear roles',
+        'Manage_projects' => 'Gestionar proyectos',
+
     ];
 
     public function openTransferModal()

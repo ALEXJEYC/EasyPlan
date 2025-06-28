@@ -71,6 +71,11 @@ class OrganizationPolicy
         return $org->isOwner($user) || 
             $user->hasPermissionInOrganization('can_transfer_organization', $org->id);
     }
+    public function manageProjects(User $user, Organization $org): bool
+    {
+        return $org->isOwner($user) || 
+            $user->hasPermissionInOrganization('Manage_projects', $org->id);
+    }
 
 
 
