@@ -19,26 +19,6 @@
 
     <!-- Controles de usuario -->
     <div class="flex items-center gap-1">
-        <!-- Notificaciones con tintineo -->
-        <!-- <button 
-            class="p-2.5 relative text-gray-600 dark:text-gray-300 rounded-full transition-all"
-            x-data="{ hovering: false }"
-            @mouseenter="hovering = true; bellAnimation()"
-            @mouseleave="hovering = false"
-            :class="{ 'bg-gray-100 dark:bg-gray-700': hovering }"
-        >
-            <i class="fas fa-bell fa-lg" id="bell-icon"></i>
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center animate-pulse">3</span>
-        </button> -->
-        <button 
-            class="p-2.5 relative text-gray-600 dark:text-gray-300 rounded-full transition-all pointer-events-none opacity-50"
-            x-data="{ hovering: false }"
-            :class="{ 'bg-gray-100 dark:bg-gray-700': hovering }"
-        >
-            <i class="fas fa-bell fa-lg" id="bell-icon"></i>
-            <!-- <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center animate-pulse">3</span> -->
-        </button>
-
 
         <!-- Cambiar Tema con animación orbital -->
         <button 

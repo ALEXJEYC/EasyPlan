@@ -1,8 +1,10 @@
 <aside class="w-full h-full flex flex-col bg-transparent">
-    <!-- Logo y título -->
+    <!-- Logo -->
     <div class="p-6 text-center" x-data="{ hoverLogo: false }" style="margin-top: 1.5rem;">
-        <x-application-logo 
-            class="h-12 w-auto mx-auto transform transition-all duration-300" 
+        <img 
+            src="/favicon-96x96.png" 
+            alt="EasyPlan Logo"
+            class="h-16 w-auto mx-auto transform transition-all duration-300 cursor-pointer"
             x-bind:class="hoverLogo ? 'scale-110' : ''"
             @mouseenter="hoverLogo = true"
             @mouseleave="hoverLogo = false"
