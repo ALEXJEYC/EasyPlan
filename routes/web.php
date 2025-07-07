@@ -14,7 +14,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\GoogleAuthController;
-
+//evidencia
+use App\Http\Controllers\EvidenceController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -93,6 +94,6 @@ Route::get('/auth/user', function () {
     }
     return null;
 });
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/download/evidence/{evidence}', [EvidenceController::class, 'download'])
+     ->name('download.evidence')
+     ->middleware('auth'); // Opcional: protege la descarga

@@ -6,17 +6,24 @@ use Livewire\Component;
 use App\Models\Project;
 use App\Models\TaskUser;
 use App\Models\Task;
+use App\Models\TaskEvidence;
 use App\Models\User;
 use App\Enums\TaskStatus;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\PermissionsHelper;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
+
 
 class ProjectTasks extends Component
 {
     use WithPagination;
-    
+    use WithFileUploads;
+    public $evidenceFiles = []; // Para almacenar los archivos subidos
+    public $uploadedEvidences = []; // Para mostrar los archivos ya subidos
+
     public $project;
     public $title;
     public $description;
@@ -66,9 +73,9 @@ class ProjectTasks extends Component
     public function clearFilters()
     {
         $this->reset([
-            'globalSearch', 
-            'searchAssignedUser', 
-            'searchDeadline', 
+            'globalSearch',
+            'searchAssignedUser',
+            'searchDeadline',
             'statusFilter'
         ]);
         $this->resetPage();
@@ -85,21 +92,6 @@ class ProjectTasks extends Component
             $this->resetPage();
         }
     }
-
-    // public function mount(Project $project)
-    // {
-    //     $this->project = $project;
-    // }
-    // public function rules()
-    // {
-    //     return [
-    //         'title' => 'required|min:3',
-    //         'description' => 'nullable|string',
-    //         'deadline' => 'required|date|after_or_equal:today', 
-    //         'assignedTo' => 'required|array|min:1',
-    //         'observation' => 'nullable|string|max:500'
-    //     ];
-    // }
     public function createTask()
     {
         $this->validate([
@@ -129,78 +121,141 @@ class ProjectTasks extends Component
         }
 
 
-    $asignados = count($this->assignedTo);
+        $asignados = count($this->assignedTo);
 
 
-    $this->reset(['title', 'description', 'deadline', 'assignedTo']);
-    
-    $this->dispatch('tasksUpdated');
-    $this->dispatch('taskCreated', projectId: $this->project->id);
+        $this->reset(['title', 'description', 'deadline', 'assignedTo']);
 
-   
-    $this->dispatch('notify', 
-        type: 'success', 
-        message: 'Tarea creada con ' . $asignados . ' asignados'
-    );
-}
-    // Agrega este método a tu componente Livewire
-public function submitTask()
-{
-    $this->validate(['observation' => 'nullable|string|max:500']);
-    
-    try {
-        $task = Task::findOrFail($this->selectedTaskId);
-        
-        if (!$task->users()->where('user_id', auth()->id())->exists()) {
-            throw new \Exception('No estás asignado a esta tarea');
-        }
-
-        $taskStatus = $task->status;
-
-        // Si es string, asegúrate de compararlo con el valor correcto
-        if ($taskStatus instanceof TaskStatus) {
-            $taskStatus = $taskStatus->value;
-        }
-
-        // Permitir el envío si la tarea está pendiente o rechazada
-        if ($taskStatus !== TaskStatus::PENDING->value && $taskStatus !== TaskStatus::REJECTED->value) {
-            throw new \Exception('Esta tarea no puede ser enviada para revisión');
-        }
-
-        DB::transaction(function () use ($task) {
-            $task->update([
-                'status' => TaskStatus::SUBMITTED->value,
-                'submitted_at' => now(),
-                'submitted_by' => auth()->id(),
-                'observation' => $this->observation,
-            ]);
-        });
-            $task->users()->updateExistingPivot(auth()->id(), [
-            'status' => TaskStatus::PENDING->value,
-        ]);
-    
-
-        $this->reset(['observation', 'selectedTaskId', 'showSubmissionModal']);
         $this->dispatch('tasksUpdated');
-         $this->dispatch('taskSubmitted', projectId: $this->project->id);
-        $this->dispatch('notify', 
-            type: 'success', 
-            message: 'Tarea enviada para revisión'
-        );
+        $this->dispatch('taskCreated', projectId: $this->project->id);
 
-    } catch (\Exception $e) {
-        $this->dispatch('notify', 
-            type: 'error', 
-            message: $e->getMessage()
+
+        $this->dispatch(
+            'notify',
+            type: 'success',
+            message: 'Tarea creada con ' . $asignados . ' asignados'
         );
     }
-}
+    public function submitTask()
+    {
+        $this->validate([
+            'observation' => 'nullable|string|max:500',
+            'evidenceFiles.*' => 'nullable|file|max:10240', // 10MB máximo por archivo
+        ]);
+
+        try {
+            $task = Task::findOrFail($this->selectedTaskId);
+
+            if (!$task->users()->where('user_id', auth()->id())->exists()) {
+                throw new \Exception('No estás asignado a esta tarea');
+            }
+
+            $taskStatus = $task->status;
+
+            if ($taskStatus instanceof TaskStatus) {
+                $taskStatus = $taskStatus->value;
+            }
+
+            if ($taskStatus !== TaskStatus::PENDING->value && $taskStatus !== TaskStatus::REJECTED->value) {
+                throw new \Exception('Esta tarea no puede ser enviada para revisión');
+            }
+
+            DB::transaction(function () use ($task) {
+                // Actualizar estado de la tarea
+                $task->update([
+                    'status' => TaskStatus::SUBMITTED->value,
+                    'submitted_at' => now(),
+                    'submitted_by' => auth()->id(),
+                    'observation' => $this->observation,
+                ]);
+
+                // Obtener la relación TaskUser
+                $taskUser = TaskUser::where('task_id', $task->id)
+                    ->where('user_id', auth()->id())
+                    ->first();
+
+                // Guardar archivos de evidencia
+                if ($this->evidenceFiles) {
+                    foreach ($this->evidenceFiles as $file) {
+                        $originalName = $file->getClientOriginalName();
+                        $path = $file->store('task_evidences', 'public');
+
+                        TaskEvidence::create([
+                            'task_user_id' => $taskUser->id,
+                            'file_path' => $path,
+                            'file_name' => $originalName,
+                            'file_size' => $file->getSize(),
+                            'file_type' => $file->getMimeType(),
+                        ]);
+                    }
+                }
+
+                $task->users()->updateExistingPivot(auth()->id(), [
+                    'status' => TaskStatus::PENDING->value,
+                ]);
+            });
+
+            $this->reset(['observation', 'selectedTaskId', 'showSubmissionModal', 'evidenceFiles']);
+            $this->dispatch('tasksUpdated');
+            $this->dispatch('taskSubmitted', projectId: $this->project->id);
+            $this->dispatch(
+                'notify',
+                type: 'success',
+                message: 'Tarea enviada para revisión con evidencia adjunta'
+            );
+        } catch (\Exception $e) {
+            $this->dispatch(
+                'notify',
+                type: 'error',
+                message: $e->getMessage()
+            );
+        }
+    }
+    public function removeEvidence($index)
+    {
+        if (isset($this->evidenceFiles[$index])) {
+            unset($this->evidenceFiles[$index]);
+            $this->evidenceFiles = array_values($this->evidenceFiles); // Reindexar array
+        }
+    }
+    public function removeUploadedEvidence($evidenceId)
+    {
+        try {
+            $evidence = TaskEvidence::findOrFail($evidenceId);
+
+            // Verificar que la evidencia pertenece al usuario actual
+            if ($evidence->taskUser->user_id !== auth()->id()) {
+                throw new \Exception('No tienes permiso para eliminar esta evidencia');
+            }
+
+            // Eliminar archivo físico
+            Storage::disk('public')->delete($evidence->file_path);
+
+            // Eliminar registro de la base de datos
+            $evidence->delete();
+
+            // Actualizar lista de evidencias subidas
+            $this->uploadedEvidences = $evidence->taskUser->evidences()->get()->toArray();
+
+            $this->dispatch(
+                'notify',
+                type: 'success',
+                message: 'Evidencia eliminada correctamente'
+            );
+        } catch (\Exception $e) {
+            $this->dispatch(
+                'notify',
+                type: 'error',
+                message: $e->getMessage()
+            );
+        }
+    }
 
     public function approveTask()
     {
         $taskUser = TaskUser::find($this->taskUserId);
         $taskUser->update(['status' => 'approved']);
-        $this->dispatch('tasksUpdated'); 
+        $this->dispatch('tasksUpdated');
         $this->dispatch('taskApproved');
         //emisor 
 
@@ -214,16 +269,27 @@ public function submitTask()
     //     }
     // }
     public function canResubmit($taskUser)
-{
-    return $taskUser->status === TaskStatus::REJECTED->value && $taskUser->user_id === Auth::id();
-}
+    {
+        return $taskUser->status === TaskStatus::REJECTED->value && $taskUser->user_id === Auth::id();
+    }
 
-public function prepareSubmit($taskId)
-{
-    $this->selectedTaskId = $taskId;
-     $this->selectedTask = Task::find($taskId); 
-    $this->showSubmissionModal = true;
-}
+    public function prepareSubmit($taskId)
+    {
+        $this->selectedTaskId = $taskId;
+        $this->selectedTask = Task::find($taskId);
+        $this->showSubmissionModal = true;
+        $this->evidenceFiles = [];
+        $this->uploadedEvidences = [];
+
+        // Cargar evidencias existentes si las hay
+        $taskUser = TaskUser::where('task_id', $taskId)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if ($taskUser) {
+            $this->uploadedEvidences = $taskUser->evidences()->get()->toArray();
+        }
+    }
 
     public function render()
     {
