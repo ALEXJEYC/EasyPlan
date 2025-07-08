@@ -31,48 +31,48 @@ class ProjectController extends Controller
         ]);
     }
 
-public function index()
-{
-    $organizations = auth()->user()->organizations()
-                        ->with(['projects' => function($query) {
-                            $query->active()->withCount('tasks');
-                        }])
-                        ->whereHas('projects')
-                        ->get();
-    
-    $archivedProjects = auth()->user()->projects()
-                        ->archived()
-                        ->with(['organization', 'users'])
-                        ->get();
-    
-    return view('projects.index', compact('organizations', 'archivedProjects'));
-}
-public function archive(Project $project)
-{
-    $this->authorize('update', $project);
-    
-    $project->update([
-        'archived' => true,
-        'archived_at' => now()
-    ]);
-    
-    return redirect()->route('projects.index')
-        ->with('success', 'El proyecto ha sido archivado correctamente.');
-}
+    public function index()
+    {
+        $organizations = auth()->user()->organizations()
+            ->with(['projects' => function ($query) {
+                $query->active()->withCount('tasks');
+            }])
+            ->whereHas('projects')
+            ->get();
 
-// Método para restaurar
-public function restore(Project $project)
-{
-    $this->authorize('update', $project);
-    
-    $project->update([
-        'archived' => false,
-        'archived_at' => null
-    ]);
-    
-    return redirect()->route('projects.index')
-        ->with('success', 'El proyecto ha sido restaurado correctamente.');
-}
+        $archivedProjects = auth()->user()->projects()
+            ->archived()
+            ->with(['organization', 'users'])
+            ->get();
+
+        return view('projects.index', compact('organizations', 'archivedProjects'));
+    }
+    public function archive(Project $project)
+    {
+        $this->authorize('update', $project);
+
+        $project->update([
+            'archived' => true,
+            'archived_at' => now()
+        ]);
+
+        return redirect()->route('projects.index')
+            ->with('success', 'El proyecto ha sido archivado correctamente.');
+    }
+
+    // Método para restaurar
+    public function restore(Project $project)
+    {
+        $this->authorize('update', $project);
+
+        $project->update([
+            'archived' => false,
+            'archived_at' => null
+        ]);
+
+        return redirect()->route('projects.index')
+            ->with('success', 'El proyecto ha sido restaurado correctamente.');
+    }
     public function downloadFile(Project $project, ProjectFile $file)
     {
         // Verificar que el usuario es miembro del proyecto
@@ -92,5 +92,4 @@ public function restore(Project $project)
 
         return Storage::disk('public')->download($file->file_path, $file->file_name);
     }
-
 }
