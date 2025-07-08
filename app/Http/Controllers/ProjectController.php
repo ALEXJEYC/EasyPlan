@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ProjectFile;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
@@ -71,5 +73,24 @@ public function restore(Project $project)
     return redirect()->route('projects.index')
         ->with('success', 'El proyecto ha sido restaurado correctamente.');
 }
+    public function downloadFile(Project $project, ProjectFile $file)
+    {
+        // Verificar que el usuario es miembro del proyecto
+        if (! $project->members->contains(auth()->user()) && !$project->isOwner(auth()->user())) {
+            abort(403, 'No tienes permiso para acceder a este archivo.');
+        }
+
+        // Verificar que el archivo pertenece al proyecto (seguridad extra)
+        if ($file->project_id !== $project->id) {
+            abort(404);
+        }
+
+        // Verificar que el archivo existe en el disco
+        if (! Storage::disk('public')->exists($file->file_path)) {
+            abort(404, 'Archivo no encontrado.');
+        }
+
+        return Storage::disk('public')->download($file->file_path, $file->file_name);
+    }
 
 }

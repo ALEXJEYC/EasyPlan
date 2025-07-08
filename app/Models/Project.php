@@ -88,4 +88,8 @@ public function scopeArchived($query)
 {
     return $query->where('status', 'archivado');
 }
+public function files()
+{
+    return $this->hasMany(ProjectFile::class);
+}
 }
