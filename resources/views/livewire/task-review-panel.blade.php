@@ -57,7 +57,7 @@
                             @endswitch
                             <p class="text-sm font-semibold text-gray-300 uppercase tracking-wider">
                                 @if ($status->value === \App\Enums\TaskStatus::SUBMITTED->value)
-                                    Enviado para Revisión
+                                    En Revisión
                                 @else
                                     {{ $status->name() }}
                                 @endif

@@ -32,20 +32,20 @@ class Login extends Component
         ];
     }
 
-    public function login()
-    {
-        $this->validate();
+public function login()
+{
+    $this->validate();
 
-        if (Auth::attempt(
-            ['email' => $this->email, 'password' => $this->password],
-            $this->remember
-        )) {
-            session()->regenerate();
-            return redirect()->route('dashboard');
-        }
-
-        $this->addError('email', 'Las credenciales no coinciden.');
+    if (Auth::attempt(
+        ['email' => $this->email, 'password' => $this->password],
+        $this->remember
+    )) {
+        session()->regenerate();
+        return redirect()->route('dashboard');
     }
+
+    $this->addError('email', 'Las credenciales no coinciden.');
+}
 
     public function register()
     {

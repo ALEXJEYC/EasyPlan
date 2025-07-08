@@ -1,5 +1,3 @@
-<!-- TODO: mejorar visibilidad del formulario sin romper logica y funcionalidades de las vistas  -->
-
 <div class="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900">
     <div class="w-full max-w-md bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <!-- Botones para alternar entre Login y Registro -->

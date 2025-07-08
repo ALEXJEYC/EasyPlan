@@ -26,7 +26,7 @@ use App\Http\Controllers\EvidenceController;
 // Autenticación
 Route::middleware('guest')->group(function () {
     // Login
-    Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::get('login', [LoginController::class, 'showLoginForm'])->name('login'); // cambia de '/' a '/login'
     Route::post('login', [LoginController::class, 'login']);
     
     // Registro
@@ -97,3 +97,7 @@ Route::get('/auth/user', function () {
 Route::get('/download/evidence/{evidence}', [EvidenceController::class, 'download'])
      ->name('download.evidence')
      ->middleware('auth'); // Opcional: protege la descarga
+     
+Route::get('/', function () {
+    return redirect()->route('login');
+});
