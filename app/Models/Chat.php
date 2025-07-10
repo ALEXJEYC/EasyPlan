@@ -45,4 +45,8 @@ class Chat extends Model
             $q->where('users.id', $userId);
         });
     }
+    public function lastMessage()
+    {
+        return $this->belongsTo(Message::class, 'last_message_id');
+    }
 }

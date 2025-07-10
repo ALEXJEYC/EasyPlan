@@ -6,6 +6,8 @@ use App\Models\Chat;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Organization;
+
 
 class ChatController extends Controller
 {
@@ -63,10 +65,15 @@ class ChatController extends Controller
     }
     public function userChats()
 {
-    $user = auth()->user();
-    $chats = $user->chats()->with(['users', 'messages' => function($query) {
-        $query->latest()->limit(1);
-    }])->get();
+$chats = auth()->user()->chats()
+        ->with([
+            'users' => function ($query) {
+                $query->where('users.id', '!=', auth()->id());
+            },
+            'lastMessage.user',
+            'project'
+        ])
+        ->get();
     
     return view('chats.index', compact('chats'));
 }

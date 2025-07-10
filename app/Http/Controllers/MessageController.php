@@ -16,6 +16,12 @@ class MessageController extends Controller
             'chat_id' => $request->chat_id,
         ])->load('user');
 
+        $chat = Chat::find($request->chat_id);
+        if ($chat){
+            $chat->last_message_id = $message->id;
+            $chat->save();
+        }
+
         broadcast(new MessageSent($message))->toOthers();
 
         return $message;

@@ -77,15 +77,15 @@
                                                     @endif
                                                 @endforeach
                                             </h3>
-                                            @if($chat->messages->isNotEmpty())
+                                            @if($chat->lastMessage)
                                                 <span class="text-xs text-gray-500 dark:text-gray-400">
-                                                    {{ $chat->messages->first()->created_at->diffForHumans() }}
+                                                    {{ $chat->lastMessage->created_at->diffForHumans() }}
                                                 </span>
                                             @endif
                                         </div>
-                                        @if($chat->messages->isNotEmpty())
+                                        @if($chat->lastMessage)
                                             <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm truncate">
-                                                {{ $chat->messages->first()->content }}
+                                                {{ $chat->lastMessage->content }}
                                             </p>
                                         @else
                                             <p class="text-gray-400 dark:text-gray-500 mt-1 text-sm italic">No hay mensajes aún</p>
@@ -144,21 +144,21 @@
                                         <div class="flex-1 min-w-0">
                                             <div class="flex justify-between items-start">
                                                 <h3 class="font-bold text-gray-800 dark:text-white truncate">{{ $chat->name ?? 'Chat grupal' }}</h3>
-                                                @if($chat->messages->isNotEmpty())
+                                                @if($chat->lastMessage)
                                                     <span class="text-xs text-gray-500 dark:text-gray-400">
-                                                        {{ $chat->messages->first()->created_at->diffForHumans() }}
+                                                        {{ $chat->lastMessage->created_at->diffForHumans() }}
                                                     </span>
                                                 @endif
                                             </div>
                                             <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm">
                                                 {{ $chat->users->count() }} participantes
                                             </p>
-                                            @if($chat->messages->isNotEmpty())
+                                            @if($chat->lastMessage)
                                                 <p class="text-gray-600 dark:text-gray-300 mt-2 text-sm truncate">
                                                     <span class="font-medium">
-                                                        {{ $chat->messages->first()->user->name }}:
+                                                        {{ $chat->lastMessage->user->name }}:
                                                     </span>
-                                                    {{ $chat->messages->first()->content }}
+                                                    {{ $chat->lastMessage->content }}
                                                 </p>
                                             @endif
                                             <div class="mt-4">
@@ -221,16 +221,16 @@
                                                         {{ $chat->users->count() }} miembros
                                                     </p>
                                                 </div>
-                                                @if($chat->messages->isNotEmpty())
+                                                @if($chat->lastMessage)
                                                     <span class="text-xs text-gray-500 dark:text-gray-400">
-                                                        {{ $chat->messages->first()->created_at->diffForHumans() }}
+                                                        {{ $chat->lastMessage->created_at->diffForHumans() }}
                                                     </span>
                                                 @endif
                                             </div>
-                                            @if($chat->messages->isNotEmpty())
+                                            @if($chat->lastMessage)
                                                 <p class="text-gray-600 dark:text-gray-300 mt-3 text-sm">
-                                                    <span class="font-medium">{{ $chat->messages->first()->user->name }}:</span>
-                                                    {{ Str::limit($chat->messages->first()->content, 100) }}
+                                                    <span class="font-medium">{{ $chat->lastMessage->user->name }}:</span>
+                                                    {{ Str::limit($chat->lastMessage->content, 100) }}
                                                 </p>
                                             @endif
                                             <div class="mt-4 flex justify-between items-center">
