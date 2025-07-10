@@ -92,4 +92,9 @@ public function files()
 {
     return $this->hasMany(ProjectFile::class);
 }
+public function isOwner($user)
+{
+    return $this->user_id === $user->id;
+}
+
 }

@@ -28,8 +28,10 @@
         <!-- Pestaña: Descripción -->
         <div x-show="tab === 'description'" class="mb-8">
             <h2 class="text-xl font-semibold mb-4">Visión de la organización</h2>
-            <p class="text-gray-600 dark:text-gray-400">Aquí puedes agregar una descripción o visión general de la
-                organización.</p>
+            <p class="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                 {{ $organization->description ?? 'Sin descripción disponible.' }}
+            </p>
+
         </div>
 
         <!-- Pestaña: Chats -->

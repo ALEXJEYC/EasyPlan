@@ -25,6 +25,8 @@ class OrganizationController extends Controller
         $user = auth()->user();
         $permissions = PermissionsHelper::getFor($user, $organization);
         $organization->load('members', 'projects', 'chats');
+        // dd($organization->description);
+
 
         return view('organizations.show', [
             'organization' => $organization,

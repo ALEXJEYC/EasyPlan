@@ -6,6 +6,14 @@
 <div class="container mx-auto px-4 py-8 max-w-md">
 
     <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">Bienvenido de vuelta</h1>
+        {{-- Bloque para mostrar errores de sesión --}}
+    @if (session('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong class="font-bold">¡Error!</strong>
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+    @endif
+
     
     <form method="POST" action="{{ route('login') }}" class="space-y-6">
         @csrf

@@ -3,9 +3,12 @@
     <div class="flex flex-col items-center">
       
       <!-- Imagen de perfil -->
-      @if(Auth::user()->profile_photo_path)
+      @if (Auth::user()->profile_photo_path)
         <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="Foto de perfil" 
           class="w-32 h-32 rounded-full border-4 border-blue-500 shadow-lg mb-4 object-cover">
+      @elseif (Auth::user()->avatar)
+        <img src="{{ Auth::user()->avatar }}" alt="Foto de perfil" 
+          class="w-32 h-32 rounded-full border-4 border-blue-500 shadow-lg mb-4 object-cover" referrerpolicy="no-referrer">
       @else
         <div class="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 mb-4">
           <i class="fas fa-user fa-4x"></i>

@@ -11,7 +11,7 @@
             Descripción del Proyecto
         </h2>
         <p class="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
-            {{ $project->description }}
+            {{ $project->description ?? 'Sin descripción disponible.' }}
         </p>
     </div>
 

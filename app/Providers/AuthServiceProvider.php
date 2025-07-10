@@ -2,6 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Chat;
+use App\Models\Organization;
+use App\Models\Project;
+use App\Models\Task;
+use App\Policies\ChatPolicy;
+use App\Policies\OrganizationPolicy;
+use App\Policies\ProjectPolicy;
+use App\Policies\TaskPolicy;
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
