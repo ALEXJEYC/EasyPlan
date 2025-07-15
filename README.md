@@ -4,7 +4,7 @@
 
 ## 🚀 Tecnologías Usadas
 
-- Laravel 11
+- Laravel 10
 - Laravel WebSockets
 - Laravel Echo
 - Alpine.js
